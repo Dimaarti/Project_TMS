@@ -1,4 +1,3 @@
-from django.db.models import ForeignKey
 from django.db import models
 
 from china_calc.account.models import User
@@ -6,9 +5,9 @@ from config.models import BaseModel
 
 
 class Client(BaseModel):
-    user = ForeignKey(
+    user = models.ForeignKey(
         User,
-        related_name='client',
+        related_name='clients',
         on_delete=models.CASCADE
     )
     full_name = models.CharField(
@@ -32,5 +31,5 @@ class Client(BaseModel):
 
     class Meta:
         db_table = 'client'
-        verbose_name = 'client'
-        verbose_name_plural = 'clients'
+        verbose_name = 'Клиент'
+        verbose_name_plural = 'Клиенты'
