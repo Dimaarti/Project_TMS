@@ -1,7 +1,4 @@
 from django.db import models
-
-from china_calc.account.models import User
-
 from config.models import BaseModel
 
 
@@ -12,7 +9,7 @@ class RouteShipment(models.TextChoices):
 
 class Shipment(BaseModel):
     user = models.ForeignKey(
-        User,
+        to = 'account.User',
         on_delete=models.CASCADE,
         related_name='shipment',
     )
@@ -44,3 +41,6 @@ class Shipment(BaseModel):
         db_table = 'shipment'
         verbose_name = "Поставка"
         verbose_name_plural = "Поставки"
+
+    def __str__(self):
+        return self.number
