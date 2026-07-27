@@ -1,13 +1,10 @@
 from django.db import models
 
-class TransportType(models.TextChoices):
-    AIR = 'air', 'Авиационный'
-    AUTO = 'auto', 'Автомобильный'
-    SEA = 'sea', 'Морской'
-    RAIL = 'rail','Железнодорожный'
+from config.model_choices import TransportType
+from config.models import BaseModel
 
 
-class Route(models.Model):
+class Route(BaseModel):
     name = models.CharField(
         max_length=100,
         verbose_name='Название маршрута'
@@ -38,4 +35,5 @@ class Route(models.Model):
         verbose_name_plural = 'Маршруты доставки'
 
     def __str__(self):
-        return f'Маршрут[{self.name}, {self.transport_type}]'
+        return (f'Маршрут[{self.name} -, '
+                f'{self.transport_type}]')

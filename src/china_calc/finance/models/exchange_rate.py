@@ -9,32 +9,62 @@ class ExchangeRate(BaseModel):
 
     cny_to_byn = models.DecimalField(
         max_digits=10,
-        decimal_places=2,
-        verbose_name='Курс СNY/BYN'
+        decimal_places=4,
+        verbose_name='Курс СNY/BYN - себестоимость'
+    )
+
+    cny_to_byn_client = models.DecimalField(
+        max_digits=10,
+        decimal_places=4,
+        verbose_name='Курс СNY/BYN - для клиента'
     )
 
     cny_to_rub = models.DecimalField(
         max_digits=10,
-        decimal_places=2,
-        verbose_name='Курс СNY/RUB'
+        decimal_places=4,
+        verbose_name='Курс СNY/RUB - себестоимость'
+    )
+
+    cny_to_rub_client = models.DecimalField(
+        max_digits=10,
+        decimal_places=4,
+        verbose_name='Курс СNY/RUB - для клиента'
     )
 
     usd_to_byn = models.DecimalField(
         max_digits=10,
-        decimal_places=2,
-        verbose_name='Курс USD/BYN'
+        decimal_places=4,
+        verbose_name='Курс USD/BYN - себестоимость'
+    )
+
+    usd_to_byn_client = models.DecimalField(
+        max_digits=10,
+        decimal_places=4,
+        verbose_name='Курс USD/BYN - для клиента'
     )
 
     usd_to_rub = models.DecimalField(
         max_digits=10,
-        decimal_places=2,
-        verbose_name='Курс USD/RUB'
+        decimal_places=4,
+        verbose_name='Курс USD/RUB - себестоимость'
+    )
+
+    usd_to_rub_client = models.DecimalField(
+        max_digits=10,
+        decimal_places=4,
+        verbose_name='Курс USD/RUB - для клиента'
     )
 
     rub_to_byn = models.DecimalField(
         max_digits=10,
-        decimal_places=2,
-        verbose_name='Курс RUB/BYN'
+        decimal_places=4,
+        verbose_name='Курс RUB/BYN - себестоимость'
+    )
+
+    rub_to_byn_client = models.DecimalField(
+        max_digits=10,
+        decimal_places=4,
+        verbose_name='Курс RUB/BYN - для клиента'
     )
 
     class Meta:

@@ -27,7 +27,7 @@ class CalculationResult(BaseModel):
     )
 
     counter_currency = models.CharField(
-        max_length=5,
+        max_length=3,
         verbose_name='Валюта котировки'
     )
 
@@ -35,7 +35,14 @@ class CalculationResult(BaseModel):
         max_digits=16,
         decimal_places=2,
         default=0,
-        verbose_name='Стоимость товара'
+        verbose_name='Стоимость товара, ¥'
+    )
+
+    client_purchase_cost = models.DecimalField(
+        max_digits=16,
+        decimal_places=2,
+        default=0,
+        verbose_name='Стоимость товара для клиента, ¥'
     )
 
     logistics_cost = models.DecimalField(
@@ -45,18 +52,11 @@ class CalculationResult(BaseModel):
         verbose_name='Логистические расходы'
     )
 
-    duty_cost = models.DecimalField(
-        max_digits=16,
-        decimal_places=2,
-        default=0,
-        verbose_name='Расчет пошлины'
-    )
-
     buyer_commission_cost = models.DecimalField(
         max_digits=16,
         decimal_places=2,
         default=0,
-        verbose_name='Расчет комиссии байера'
+        verbose_name='Расчет комиссии байера, %'
     )
 
     price_cost = models.DecimalField(
@@ -66,6 +66,13 @@ class CalculationResult(BaseModel):
         verbose_name='Расчет себестоимости'
     )
 
+    client_price_cost = models.DecimalField(
+        max_digits=16,
+        decimal_places=2,
+        default=0,
+        verbose_name='Итого для клиента'
+    )
+
     profit_cost = models.DecimalField(
         max_digits=16,
         decimal_places=2,
@@ -73,7 +80,7 @@ class CalculationResult(BaseModel):
         verbose_name='Прибыль'
     )
 
-    add_services = models.DecimalField(
+    additional_services = models.DecimalField(
         max_digits=16,
         decimal_places=2,
         default=0,
