@@ -1,4 +1,4 @@
-from .shipment import Shipment
 from .product import Product
-from .shipment_item import ShipmentItem
+from .shipment import Shipment
 from .shipment_expense import ShipmentExpense
+from .shipment_item import ShipmentItem
