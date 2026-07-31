@@ -25,16 +25,14 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         default=False,
     )
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = "email"
 
     objects = UserManager()
 
     def __str__(self):
-        return f'{self.email}'
+        return f"{self.email}"
 
     class Meta:
-        db_table = 'user'
-        verbose_name_plural = 'Users'
-        verbose_name = 'User'
-
-
+        db_table = "user"
+        verbose_name_plural = "Users"
+        verbose_name = "User"
