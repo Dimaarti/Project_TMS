@@ -9,118 +9,117 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-import os
-from pathlib import Path
 
-from config.env import env, BASE_DIR
+import os
+
+from config.env import BASE_DIR, env
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = ['testserver', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ["testserver", "localhost", "127.0.0.1"]
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django_extensions',
-    'crispy_forms',
-    'crispy_bootstrap5',
-    'debug_toolbar',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django_extensions",
+    "crispy_forms",
+    "crispy_bootstrap5",
+    "debug_toolbar",
     # applications
-    'china_calc.account',
-    'china_calc.client',
-    'china_calc.shipment',
-    'china_calc.logistics',
-    'china_calc.finance',
-    'china_calc.reports',
+    "china_calc.account",
+    "china_calc.client",
+    "china_calc.shipment",
+    "china_calc.logistics",
+    "china_calc.finance",
+    "china_calc.reports",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
+    "django.middleware.security.SecurityMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = "config.urls"
 
-#internal ips
-INTERNAL_IPS = ['127.0.0.1']
+# internal ips
+INTERNAL_IPS = ["127.0.0.1"]
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [(os.path.join(BASE_DIR.parent, 'templates'))],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [(os.path.join(BASE_DIR.parent, "templates"))],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+WSGI_APPLICATION = "config.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('PG_NAME'),
-        'USER': env('PG_USER'),
-        'PASSWORD': env('PG_PASS'),
-        'HOST': env('PG_HOST'),
-        'PORT': env('PG_PORT'),
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": env("PG_NAME"),
+        "USER": env("PG_USER"),
+        "PASSWORD": env("PG_PASS"),
+        "HOST": env("PG_HOST"),
+        "PORT": env("PG_PORT"),
     }
 }
 
-AUTH_USER_MODEL = 'account.User'
+AUTH_USER_MODEL = "account.User"
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -128,32 +127,32 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR.parent / 'static/images/'
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR.parent / "static/images/"
 
 # media
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR.parent / 'media'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR.parent / "media"
 
 
 STORAGES = {
-    'default': {
+    "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    }
+    },
 }
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # bootstrap 5
 
-CRISPY_TEMPLATE_PACK = 'bootstrap5'
-CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 # account login
-LOGIN_URL = 'account:login'
-LOGOUT_URL = 'account:logout'
-LOGIN_REDIRECT_URL = 'shipment:list'
-LOGOUT_REDIRECT_URL = 'account:login'
+LOGIN_URL = "account:login"
+LOGOUT_URL = "account:logout"
+LOGIN_REDIRECT_URL = "shipment:list"
+LOGOUT_REDIRECT_URL = "account:login"
