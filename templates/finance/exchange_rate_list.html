@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="mb-1">
+                Курсы валют
+            </h1>
+
+
+        </div>
+
+        <a
+            href="{% url 'finance:create' %}"
+            class="btn btn-primary"
+        >
+            Добавить курсы
+        </a>
+    </div>
+
+    {% if exchange_rate %}
+        <div class="card border-0 shadow-sm">
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">
+                                ID
+                            </th>
+
+                            <th>
+                                Дата
+                            </th>
+
+                            <th class="text-end pe-4">
+                                Действия
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for rate in exchange_rate %}
+                            <tr>
+                                <td class="ps-4">
+                                    #{{ rate.pk }}
+                                </td>
+
+                                <td>
+                                    {{ rate.date|date:"d.m.Y" }}
+                                </td>
+
+                                <td class="text-end pe-4">
+                                    <div class="d-inline-flex gap-2">
+
+                                        <a
+                                            href="{% url 'finance:detail' pk=rate.pk %}"
+                                            class="btn btn-sm btn-outline-primary"
+                                        >
+                                            Подробнее
+                                        </a>
+
+                                        <form
+                                            method="post"
+                                            action="{% url 'finance:delete' pk=rate.pk %}"
+
+                                        >
+                                            {% csrf_token %}
+
+                                            <button
+                                                type="submit"
+                                                class="btn btn-sm btn-outline-danger"
+                                            >
+                                                Удалить
+                                            </button>
+                                        </form>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            Курсы валют пока не добавлены.
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

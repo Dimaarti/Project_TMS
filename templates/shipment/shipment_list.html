@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-body-tertiary min-vh-100 container py-4">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="mb-1">
+                Поставки
+            </h1>
+
+            <div class="text-muted">
+                Список созданных поставок и результаты расчётов
+            </div>
+        </div>
+
+        <a
+                href="{% url 'shipment:create' %}"
+                class="btn btn-primary"
+        >
+            Создать поставку
+        </a>
+    </div>
+
+    {% for ship in shipment %}
+    <div class="card border-0 shadow shipment-card mb-4">
+
+        <div class="card-header bg-white py-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+                <div>
+                    <div class="d-flex align-items-center gap-2">
+                        <h5 class="mb-0">
+                            Поставка {{ ship.number }}
+                        </h5>
+
+                        <span class="badge text-bg-light">
+                                {{ ship.status }}
+                            </span>
+                    </div>
+
+                    <div class="text-muted small mt-1">
+                        {{ ship.route. }}
+                    </div>
+                </div>
+
+                <a
+                        href="{% url 'shipment:detail' pk=ship.pk %}"
+                        class="btn btn-sm btn-outline-primary"
+                >
+                    Подробнее
+                </a>
+
+            </div>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-sm-6 col-lg-3">
+                    <div class="text-muted small">
+                        Итоговая валюта
+                    </div>
+
+                    <div class="fw-semibold">
+                        {{ ship.settlement_final_currency }}
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-3">
+                    <div class="text-muted small">
+                        Вес
+                    </div>
+
+                    <div class="fw-semibold">
+                        {{ ship.weight }} кг
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-3">
+                    <div class="text-muted small">
+                        Объём
+                    </div>
+
+                    <div class="fw-semibold">
+                        {{ ship.volume }} м³
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-3">
+                    <div class="text-muted small">
+                        Обменный курс
+                    </div>
+
+                    <div class="fw-semibold">
+                        {{ ship.exchange_rate|default:"Не выбран" }}
+                    </div>
+                </div>
+
+            </div>
+
+            {% if ship.calculation_result %}
+            {% with result=ship.calculation_result %}
+
+            <div class="border rounded-3 overflow-hidden">
+
+                <div class="bg-light px-3 py-2 border-bottom">
+                    <div class="d-flex flex-wrap justify-content-between gap-2">
+                                    <span class="fw-semibold">
+                                        Результат расчёта
+                                    </span>
+
+                        <span class="text-muted small">
+                                        {{ result.base_currency }}
+                                        →
+                                        {{ result.counter_currency }}
+                                    </span>
+                    </div>
+                </div>
+
+                <div class="p-3">
+                    <div class="row g-4">
+
+                        <div class="col-6 col-md-4 col-xl">
+                            <div class="text-muted small">
+                                Стоимость товаров
+                            </div>
+
+                            <div class="fw-semibold">
+                                {{ result.purchase_cost }}
+                                {{ result.counter_currency }}
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-md-4 col-xl">
+                            <div class="text-muted small">
+                                Логистика
+                            </div>
+
+                            <div class="fw-semibold">
+                                {{ result.logistics_cost }}
+                                {{ result.counter_currency }}
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-md-4 col-xl">
+                            <div class="text-muted small">
+                                Дополнительные услуги
+                            </div>
+
+                            <div class="fw-semibold">
+                                {{ result.additional_services }}
+                                {{ result.counter_currency }}
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-md-4 col-xl">
+                            <div class="text-muted small">
+                                Комиссия байера
+                            </div>
+
+                            <div class="fw-semibold">
+                                {{ result.buyer_commission_cost }}
+                                {{ result.counter_currency }}
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-md-4 col-xl">
+                            <div class="text-muted small">
+                                Себестоимость
+                            </div>
+
+                            <div class="fw-bold text-primary">
+                                {{ result.price_cost }}
+                                {{ result.counter_currency }}
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-md-4 col-xl">
+                            <div class="text-muted small">
+                                Итого клиенту
+                            </div>
+
+                            <div class="fw-bold">
+                                {{ result.client_price_cost }}
+                                {{ result.counter_currency }}
+                            </div>
+                        </div>
+
+                        <div class="col-6 col-md-4 col-xl">
+                            <div class="text-muted small">
+                                Прибыль
+                            </div>
+
+                            <div class="fw-bold text-success">
+                                {{ result.profit_cost }}
+                                {{ result.counter_currency }}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            {% endwith %}
+            {% else %}
+            <div class="alert alert-warning mb-0">
+                Расчёт поставки ещё не выполнен.
+
+                <a
+                        href="{% url 'shipment:detail' pk=ship.pk %}"
+                        class="alert-link"
+                >
+                    Перейти к расчёту
+                </a>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+    {% empty %}
+    <div class="alert alert-info">
+        Поставок пока нет.
+    </div>
+    {% endfor %}
+     <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">«</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">‹</a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                {% if num == page_obj.number %}
+                <li class="page-item active">
+                    <span class="page-link">{{ num }}</span>
+                </li>
+                {% elif num >= page_obj.number|add:-2 and num <= page_obj.number|add:2 %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">›</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">»</a>
+                </li>
+                {% endif %}
+
+            </ul>
+        </nav>
+    </div>
+
+</div>
+{% endblock %}

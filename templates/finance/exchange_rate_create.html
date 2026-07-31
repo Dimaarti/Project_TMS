@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container py-4">
+
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="mb-1">
+                Добавление курсов
+            </h1>
+
+            <div class="text-muted">
+                Укажите внутренние курсы и курсы для клиентов
+            </div>
+        </div>
+
+        <a
+            href="{% url 'finance:list' %}"
+            class="btn btn-outline-secondary"
+        >
+            Все курсы
+        </a>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% for hidden_field in form.hidden_fields %}
+            {{ hidden_field }}
+        {% endfor %}
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        {# Дата #}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">
+                    Дата курса
+                </h5>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        {{ form.date|as_crispy_field }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-1">
+                            Курсы для Беларуси
+                        </h5>
+
+                        <div class="text-muted small">
+                            Итоговая валюта BYN
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="border rounded-3 p-3 mb-4">
+                            <h6 class="mb-3">
+                                Китайский юань — CNY
+                            </h6>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form.cny_to_byn|as_crispy_field }}
+                                </div>
+
+                                <div class="col-md-6">
+                                    {{ form.cny_to_byn_client|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border rounded-3 p-3 mb-4">
+                            <h6 class="mb-3">
+                                Доллар США — USD
+                            </h6>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form.usd_to_byn|as_crispy_field }}
+                                </div>
+
+                                <div class="col-md-6">
+                                    {{ form.usd_to_byn_client|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border rounded-3 p-3">
+                            <h6 class="mb-3">
+                                Российский рубль — RUB
+                            </h6>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form.rub_to_byn|as_crispy_field }}
+                                </div>
+
+                                <div class="col-md-6">
+                                    {{ form.rub_to_byn_client|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-1">
+                            Курсы для России
+                        </h5>
+
+                        <div class="text-muted small">
+                            Итоговая валюта RUB
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="border rounded-3 p-3 mb-4">
+                            <h6 class="mb-3">
+                                Китайский юань — CNY
+                            </h6>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form.cny_to_rub|as_crispy_field }}
+                                </div>
+
+                                <div class="col-md-6">
+                                    {{ form.cny_to_rub_client|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border rounded-3 p-3">
+                            <h6 class="mb-3">
+                                Доллар США — USD
+                            </h6>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form.usd_to_rub|as_crispy_field }}
+                                </div>
+
+                                <div class="col-md-6">
+                                    {{ form.usd_to_rub_client|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-light border mt-4 mb-0">
+                            <strong>Себестоимость</strong> — курс, по которому
+                            рассчитываются ваши расходы.
+
+                            <br>
+
+                            <strong>Для клиента</strong> — курс, по которому
+                            рассчитывается клиентская стоимость.
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="d-flex flex-wrap justify-content-end gap-2 mt-4">
+            <a
+                href="{% url 'finance:list' %}"
+                class="btn btn-outline-secondary"
+            >
+                Отмена
+            </a>
+
+            <button
+                type="submit"
+                class="btn btn-success"
+            >
+                Сохранить курсы
+            </button>
+        </div>
+
+    </form>
+
+</div>
+{% endblock %}

@@ -1,0 +1,439 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="mb-1">
+                Поставка {{ shipment.number }}
+            </h1>
+
+            <div class="text-muted">
+                ID: {{ shipment.pk }}
+                · Статус: {{ shipment.status }}
+            </div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+            <a
+                    href="{% url 'shipment:list' %}"
+                    class="btn btn-outline-secondary"
+            >
+                Все поставки
+            </a>
+
+            <a
+                    href="{% url 'shipment:update' pk=shipment.pk %}"
+                    class="btn btn-outline-primary"
+            >
+                Редактировать
+            </a>
+
+            <form
+                    method="post"
+                    action="{% url 'shipment:delete' pk=shipment.pk %}"
+                    class="d-inline"
+                    onsubmit="return confirm('Удалить поставку {{ shipment.number }}?');"
+            >
+                {% csrf_token %}
+
+                <button
+                        type="submit"
+                        class="btn btn-outline-danger"
+                >
+                    Удалить
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0">
+                Информация о поставке
+            </h5>
+        </div>
+
+        <div class="card-body">
+            <div class="row g-4">
+
+                <div class="col-sm-6 col-lg-4">
+                    <div class="text-muted small">
+                        Номер поставки
+                    </div>
+                    <div class="fw-semibold">
+                        {{ shipment.number }}
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-4">
+                    <div class="text-muted small">
+                        Маршрут
+                    </div>
+                    <div class="fw-semibold">
+                        {{ shipment.route }}
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-4">
+                    <div class="text-muted small">
+                        Итоговая валюта
+                    </div>
+                    <div class="fw-semibold">
+                        {{ shipment.settlement_final_currency }}
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-4">
+                    <div class="text-muted small">
+                        Тариф за 1 кг
+                    </div>
+                    <div class="fw-semibold">
+                        {{ shipment.tariff_one_kg }}
+                        {{ shipment.tariff_currency }}
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-4">
+                    <div class="text-muted small">
+                        Тариф за 1 м³
+                    </div>
+                    <div class="fw-semibold">
+                        {{ shipment.tariff_one_m3 }}
+                        {{ shipment.tariff_currency }}
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-4">
+                    <div class="text-muted small">
+                        Способ расчёта
+                    </div>
+                    <div class="fw-semibold">
+                        {{ shipment.get_logistic_calculation_type_display }}
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-4">
+                    <div class="text-muted small">
+                        Общий вес
+                    </div>
+                    <div class="fw-semibold">
+                        {{ shipment.weight }} кг
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-4">
+                    <div class="text-muted small">
+                        Общий объём
+                    </div>
+                    <div class="fw-semibold">
+                        {{ shipment.volume }} м³
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-lg-4">
+                    <div class="text-muted small">
+                        Обменный курс
+                    </div>
+                    <div class="fw-semibold">
+                        {{ shipment.exchange_rate|default:"Не выбран" }}
+                    </div>
+                </div>
+
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <div class="fw-semibold">
+                        Обменные курсы
+                    </div>
+                    <div class="text-muted small">
+                        Внутренние и клиентские курсы валют
+                    </div>
+                </div>
+
+                <a
+                        href="{% url 'finance:create' %}"
+                        class="btn btn-outline-primary"
+                >
+                    Задать курсы
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {# Товары #}
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                Товары в поставке
+            </h5>
+
+            <a
+                    href="{% url 'shipment:item_create' pk=shipment.pk %}"
+                    class="btn btn-sm btn-outline-primary"
+            >
+                Добавить товар
+            </a>
+        </div>
+
+        <div class="card-body">
+            <div class="row g-3">
+
+                {% for item in shipment.item.all %}
+                <div class="col-12 col-md-6 col-xl-4">
+                    <div class="card h-100 border">
+                        <div class="card-body small">
+
+                            <div class="d-flex justify-content-between gap-2 mb-2">
+                                    <span class="fw-bold">
+                                        {{ item.product }}
+                                    </span>
+
+                                <span class="badge text-bg-light">
+                                        {{ item.quantity }} шт.
+                                    </span>
+                            </div>
+
+                            <div class="mb-1">
+                                <span class="text-muted">Клиент:</span>
+                                {{ item.client }}
+                            </div>
+
+                            <div class="mb-1">
+                                <span class="text-muted">Трек-номер:</span>
+                                {{ item.tracking_number|default:"—" }}
+                            </div>
+
+                            <div class="mb-1">
+                                <span class="text-muted">Цена:</span>
+                                {{ item.price }}
+                                {{ item.price_currency }}
+                            </div>
+
+                            <div class="mb-1">
+                                <span class="text-muted">Комиссия:</span>
+                                {{ item.client.buyer_commission_percent }}%
+                            </div>
+
+                            <div class="mb-1">
+                                <span class="text-muted">Проверка:</span>
+                                {{ item.inspection_cost }} USD
+                            </div>
+
+                            <div class="mb-1">
+                                <span class="text-muted">Фотоотчёт:</span>
+                                {{ item.photo_report_cost }} USD
+                            </div>
+
+                            <div class="mb-1">
+                                <span class="text-muted">Упаковка:</span>
+                                {{ item.packaging_cost }} USD
+                            </div>
+
+                            {% if item.product_link %}
+                            <div class="mt-3">
+                                <a
+                                        href="{{ item.product_link }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="btn btn-sm btn-outline-secondary"
+                                >
+                                    Открыть товар
+                                </a>
+                            </div>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info mb-0">
+                        В поставке пока нет товаров.
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                Результат расчёта
+            </h5>
+
+            <form
+                    method="post"
+                    action="{% url 'shipment:calculate' pk=shipment.pk %}"
+            >
+                {% csrf_token %}
+
+                <button
+                        type="submit"
+                        class="btn btn-sm btn-success"
+                >
+                    Рассчитать
+                </button>
+                <a
+                        href="{% url 'reports:shipment_reports' shipment.pk %}"
+                        class="btn btn-outline-success"
+                >
+                    Скачать отчет
+                </a>
+            </form>
+        </div>
+
+        <div class="card-body">
+            {% if shipment.calculation_result %}
+            {% with result=shipment.calculation_result %}
+
+            <div class="row g-4">
+
+                <div class="col-lg-6">
+                    <div class="card h-100 border-primary">
+                        <div class="card-header text-bg-primary">
+                            Расчёт себестоимости
+                        </div>
+
+                        <div class="card-body p-0">
+                            <table class="table table-sm mb-0 align-middle">
+                                <tbody>
+                                <tr>
+                                    <th class="ps-3 py-3">
+                                        Стоимость товаров
+                                    </th>
+                                    <td class="text-end pe-3">
+                                        {{ result.purchase_cost }}
+                                        {{ result.counter_currency }}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th class="ps-3 py-3">
+                                        Логистика
+                                    </th>
+                                    <td class="text-end pe-3">
+                                        {{ result.logistics_cost }}
+                                        {{ result.counter_currency }}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th class="ps-3 py-3">
+                                        Дополнительные услуги
+                                    </th>
+                                    <td class="text-end pe-3">
+                                        {{ result.additional_services }}
+                                        {{ result.counter_currency }}
+                                    </td>
+                                </tr>
+
+                                <tr class="table-primary">
+                                    <th class="ps-3 py-3">
+                                        Полная себестоимость
+                                    </th>
+                                    <td class="text-end pe-3 fw-bold">
+                                        {{ result.price_cost }}
+                                        {{ result.counter_currency }}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th class="ps-3 py-3">
+                                        Прибыль
+                                    </th>
+                                    <td class="text-end pe-3 fw-bold text-success">
+                                        {{ result.profit_cost }}
+                                        {{ result.counter_currency }}
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card h-100 border-success">
+                        <div class="card-header text-bg-success">
+                            Расчёт для клиента
+                        </div>
+
+                        <div class="card-body p-0">
+                            <table class="table table-sm mb-0 align-middle">
+                                <tbody>
+                                <tr>
+                                    <th class="ps-3 py-3">
+                                        Стоимость товаров
+                                    </th>
+                                    <td class="text-end pe-3">
+                                        {{ result.client_purchase_cost }}
+                                        {{ result.counter_currency }}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th class="ps-3 py-3">
+                                        Комиссия байера
+                                    </th>
+                                    <td class="text-end pe-3">
+                                        {{ result.buyer_commission_cost }}
+                                        {{ result.counter_currency }}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th class="ps-3 py-3">
+                                        Логистика
+                                    </th>
+                                    <td class="text-end pe-3">
+                                        {{ result.logistics_cost }}
+                                        {{ result.counter_currency }}
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <th class="ps-3 py-3">
+                                        Дополнительные услуги
+                                    </th>
+                                    <td class="text-end pe-3">
+                                        {{ result.additional_services }}
+                                        {{ result.counter_currency }}
+                                    </td>
+                                </tr>
+
+                                <tr class="table-success">
+                                    <th class="ps-3 py-3">
+                                        Итого для клиента
+                                    </th>
+                                    <td class="text-end pe-3 fw-bold">
+                                        {{ result.client_price_cost }}
+                                        {{ result.counter_currency }}
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            {% endwith %}
+            {% else %}
+            <div class="alert alert-warning mb-0">
+                Расчёт ещё не выполнен.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+
+</div>
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="mb-1">
+                Клиенты
+            </h1>
+
+            <div class="text-muted">
+                Список клиентов и условия комиссии
+            </div>
+        </div>
+
+        <a
+                href="{% url 'client:create' %}"
+                class="btn btn-primary"
+        >
+            Добавить клиента
+        </a>
+    </div>
+
+    {% if client %}
+    <div class="row g-4">
+
+        {% for item in client %}
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div
+                                    class="rounded-circle bg-primary text-white
+                                               d-flex align-items-center justify-content-center
+                                               fw-bold"
+                                    style="width: 42px; height: 42px;"
+                            >
+                                {{ item.full_name|slice:":1"|upper }}
+                            </div>
+
+                            <div>
+                                <h5 class="mb-0">
+                                    {{ item.full_name }}
+                                </h5>
+
+                                <div class="text-muted small">
+                                    Клиент
+                                </div>
+                            </div>
+                        </div>
+
+                        <span class="badge text-bg-success">
+                                    {{ item.buyer_commission_percent }}%
+                                </span>
+
+                    </div>
+                </div>
+
+
+                <div class="card-body">
+
+                    <div class="mb-3">
+                        <div class="text-muted small">
+                            Телефон
+                        </div>
+
+                        <div class="fw-semibold">
+                            {% if item.phone %}
+                            <a
+                                    href="tel:{{ item.phone }}"
+                                    class="text-decoration-none"
+                            >
+                                {{ item.phone }}
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="text-muted small">
+                            Адрес
+                        </div>
+
+                        <div class="fw-semibold">
+                            {{ item.address|default:"Не указан" }}
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        Клиентов пока нет.
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

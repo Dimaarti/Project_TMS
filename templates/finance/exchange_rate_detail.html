@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <h1 class="mb-1">
+                Курсы на {{ rate.date|date:"d.m.Y" }}
+            </h1>
+
+            <div class="text-muted">
+                ID курса: {{ rate.pk }}
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a
+                href="{% url 'finance:list' %}"
+                class="btn btn-outline-secondary"
+            >
+                Все курсы
+            </a>
+
+            <form
+                method="post"
+                action="{% url 'finance:delete' rate.pk %}"
+
+            >
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="btn btn-outline-danger"
+                >
+                    Удалить
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-1">
+                        Беларусь
+                    </h5>
+
+                    <div class="text-muted small">
+                        Итоговая валюта BYN
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <table class="table mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Валюта</th>
+                                <th>Себестоимость</th>
+                                <th>Для клиента</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <th>CNY → BYN</th>
+                                <td>{{ rate.cny_to_byn }}</td>
+                                <td class="text-success fw-semibold">
+                                    {{ rate.cny_to_byn_client }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>USD → BYN</th>
+                                <td>{{ rate.usd_to_byn }}</td>
+                                <td class="text-success fw-semibold">
+                                    {{ rate.usd_to_byn_client }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>RUB → BYN</th>
+                                <td>{{ rate.rub_to_byn }}</td>
+                                <td class="text-success fw-semibold">
+                                    {{ rate.rub_to_byn_client }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-1">
+                        Россия
+                    </h5>
+
+                    <div class="text-muted small">
+                        Итоговая валюта RUB
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <table class="table mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Валюта</th>
+                                <th>Себестоимость</th>
+                                <th>Для клиента</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <th>CNY → RUB</th>
+                                <td>{{ rate.cny_to_rub }}</td>
+                                <td class="text-success fw-semibold">
+                                    {{ rate.cny_to_rub_client }}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>USD → RUB</th>
+                                <td>{{ rate.usd_to_rub }}</td>
+                                <td class="text-success fw-semibold">
+                                    {{ rate.usd_to_rub_client }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
