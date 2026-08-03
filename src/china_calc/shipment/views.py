@@ -21,6 +21,9 @@ class ShipmentListView(LoginRequiredMixin, ListView):
     ).order_by("id")
     paginate_by = 5
 
+    def get_queryset(self):
+        return Shipment.objects.filter(user=self.request.user)
+
 
 class ShipmentCreateView(LoginRequiredMixin, CreateView):
     model = Shipment

@@ -27,7 +27,7 @@ class ShipmentExpense(BaseModel):
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Сумма")
 
     currency = models.CharField(
-        max_length=10, choices=Currency.choices, verbose_name="Валюта"
+        max_length=10, choices=Currency.choices, verbose_name="Валюта", default=Currency.USD
     )
 
     note = models.CharField(
