@@ -23,6 +23,7 @@ class TestClientView(TestCase):
         response = self.client.post(
             reverse("client:create"),
             data={
+                "user": self.user.id,
                 "full_name": "Дима",
                 "phone": 111,
                 "address": "Минск",
