@@ -170,5 +170,36 @@ Excel-отчёты
 
 Формирование отчётов выполняется с помощью openpyxl.
 
-+ добавится Docker
+Docker
+1) Собираем Docker-образы и запускаем проект:
+docker compose up --build
+
+2) После успешного запуска приложение будет доступно по адресу:
+http://localhost:8000
+
+3) Для запуска контейнеров в фоновом режиме использовать:
+docker compose up --build -d
+
+4) Просмотр состояния контейнеров
+docker compose ps
+
+5) Просмотр логов
+
+- Логи всех сервисов:
+docker compose logs -f
+
+- Логи web:
+docker compose logs -f web
+
+6) Остановка проекта
+docker compose down
+
+7) Повторная сборка
+
+8) После изменения Dockerfile, pyproject.toml или poetry.lock пересобрать образы:
+docker compose up --build
+
+9) Удаление данных PostgreSQL
+Чтобы удалить контейнеры вместе с Docker volumes:
+docker compose down -v
 

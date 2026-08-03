@@ -1,0 +1,39 @@
+services:
+  web:
+    build:
+      context: .
+    container_name: backend
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      PG_HOST: postgresql_db
+      PG_USER: ${PG_USER}
+      PG_PASS: ${PG_PASS}
+      PG_NAME: ${PG_NAME}
+      PG_PORT: "5432"
+
+    depends_on:
+      - postgresql_db
+
+  postgresql_db:
+    image: postgres:17
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    environment:
+      POSTGRES_DB: ${PG_NAME}
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASS}
+
+
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+volumes:
+  pg_data:
+
