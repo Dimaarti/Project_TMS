@@ -5,23 +5,34 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('finance', '0001_initial'),
-        ('shipment', '0001_initial'),
+        ("finance", "0001_initial"),
+        ("shipment", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='calculationresult',
-            name='shipment',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='calculation_result', to='shipment.shipment', verbose_name='Поставка'),
+            model_name="calculationresult",
+            name="shipment",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="calculation_result",
+                to="shipment.shipment",
+                verbose_name="Поставка",
+            ),
         ),
         migrations.AddField(
-            model_name='calculationresult',
-            name='exchange_rate',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='calculation_result', to='finance.exchangerate', verbose_name='Обменный курс'),
+            model_name="calculationresult",
+            name="exchange_rate",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="calculation_result",
+                to="finance.exchangerate",
+                verbose_name="Обменный курс",
+            ),
         ),
     ]

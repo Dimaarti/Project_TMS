@@ -32,9 +32,7 @@ class TestExchangeRateView(TestCase):
         )
 
     def test_list(self):
-        response = self.client.get(
-            reverse("finance:list")
-        )
+        response = self.client.get(reverse("finance:list"))
 
         self.assertEqual(response.status_code, 200)
 
@@ -60,7 +58,7 @@ class TestExchangeRateView(TestCase):
                 "usd_to_rub_client": 91.0000,
                 "rub_to_byn": 0.0300,
                 "rub_to_byn_client": 0.0500,
-            }
+            },
         )
 
         self.assertEqual(response.status_code, 302)
@@ -73,7 +71,3 @@ class TestExchangeRateView(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertFalse(ExchangeRate.objects.filter(pk=self.exchange_rate.pk).exists())
-
-
-
-

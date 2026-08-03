@@ -19,7 +19,7 @@ class TestClientForms(TestCase):
             "full_name": "test full name",
             "phone": "000",
             "address": "Minsk",
-            "buyer_commission_percent": 5.00
+            "buyer_commission_percent": 5.00,
         }
 
     def test_form_is_valid(self):

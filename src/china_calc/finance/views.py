@@ -15,7 +15,6 @@ from china_calc.shipment.models import Shipment
 
 
 class ShipmentCalculateView(LoginRequiredMixin, View):
-
     def post(self, request, pk):
         shipment = get_object_or_404(
             Shipment.objects.select_related("exchange_rate"), pk=pk, user=request.user
@@ -29,9 +28,7 @@ class ShipmentCalculateView(LoginRequiredMixin, View):
             )
 
         except ValueError:
-            messages.error(
-                request,
-                "Поставка не рассчитана")
+            messages.error(request, "Поставка не рассчитана")
         return redirect("shipment:detail", pk=shipment.pk)
 
 
@@ -39,7 +36,6 @@ class ExchangeRateListView(LoginRequiredMixin, ListView):
     model = ExchangeRate
     context_object_name = "exchange_rate"
     template_name = "finance/exchange_rate_list.html"
-
 
 
 class ExchangeRateDetailView(LoginRequiredMixin, DetailView):

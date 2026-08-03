@@ -15,20 +15,19 @@ class TestClientView(TestCase):
         self.client.force_login(self.user)
 
     def test_list(self):
-        response = self.client.get(reverse('client:list'))
+        response = self.client.get(reverse("client:list"))
 
         self.assertEqual(response.status_code, 200)
 
     def test_create(self):
         response = self.client.post(
-            reverse('client:create'),
+            reverse("client:create"),
             data={
                 "full_name": "Дима",
                 "phone": 111,
                 "address": "Минск",
-                "buyer_commission_percent": 5
-            }
+                "buyer_commission_percent": 5,
+            },
         )
 
-        self.assertRedirects(response, reverse('client:list'))
-
+        self.assertRedirects(response, reverse("client:list"))

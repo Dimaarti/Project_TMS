@@ -101,7 +101,7 @@ class TestShipmentView(TestCase):
             "volume": 20,
             "logistic_calculation_type": LogisticCalculationMethod.WEIGHT,
             "tariff_one_m3": 30,
-            "note": "test_note"
+            "note": "test_note",
         }
         response = self.client.post(
             reverse("shipment:update", kwargs={"pk": self.shipment.pk}),
@@ -119,7 +119,9 @@ class TestShipmentView(TestCase):
         self.assertEqual(self.shipment.status, "test_status")
         self.assertEqual(self.shipment.weight, 20)
         self.assertEqual(self.shipment.volume, 20)
-        self.assertEqual(self.shipment.logistic_calculation_type, LogisticCalculationMethod.WEIGHT)
+        self.assertEqual(
+            self.shipment.logistic_calculation_type, LogisticCalculationMethod.WEIGHT
+        )
         self.assertEqual(self.shipment.tariff_one_m3, 30)
         self.assertEqual(self.shipment.note, "test_note")
 

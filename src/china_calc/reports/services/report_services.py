@@ -17,9 +17,7 @@ class ShipmentReportServices:
         )
 
         if not items:
-            raise ValueError(
-                "Невозможно скачать отчёт: в поставке нет товаров."
-            )
+            raise ValueError("Невозможно скачать отчёт: в поставке нет товаров.")
         workbook = Workbook()
         sheet = workbook.active
         sheet.title = "Отчет"

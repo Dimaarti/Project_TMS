@@ -29,14 +29,14 @@ class TestExchangeRateForm(TestCase):
 
     def test_date_is_required(self):
         data = self.data.copy()
-        data["date"] = ''
+        data["date"] = ""
         form = ExchangeRateForm(data=data)
 
         self.assertFalse(form.is_valid())
 
     def test_rate_be_number(self):
         data = self.data.copy()
-        data["cny_to_byn"] = 'текст'
+        data["cny_to_byn"] = "текст"
         form = ExchangeRateForm(data=data)
 
         self.assertFalse(form.is_valid())
@@ -45,7 +45,7 @@ class TestExchangeRateForm(TestCase):
         form = ExchangeRateForm(data=self.data)
 
         self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data['cny_to_byn'], Decimal('0.4500'))
+        self.assertEqual(form.cleaned_data["cny_to_byn"], Decimal("0.4500"))
 
 
 class TestShipmentCalculateForm(TestCase):
@@ -75,7 +75,7 @@ class TestShipmentCalculateForm(TestCase):
             "price_cost": 10000.00,
             "client_price_cost": 10000.00,
             "profit_cost": 20000.00,
-            "additional_services": 50.00
+            "additional_services": 50.00,
         }
 
     def test_form_is_valid(self):
@@ -85,7 +85,7 @@ class TestShipmentCalculateForm(TestCase):
 
     def test_exchange_rate_is_required(self):
         data = self.data.copy()
-        data["exchange_rate"] = ''
+        data["exchange_rate"] = ""
         form = ShipmentCalculateForm(data=data)
 
         self.assertFalse(form.is_valid())
@@ -101,13 +101,7 @@ class TestShipmentCalculateForm(TestCase):
             "client_price_cost",
             "profit_cost",
             "additional_services",
-        ] = 'не число'
+        ] = "не число"
         form = ShipmentCalculateForm(data=data)
 
         self.assertFalse(form.is_valid())
-
-
-
-
-
-

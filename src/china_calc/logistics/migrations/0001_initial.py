@@ -4,28 +4,63 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Route',
+            name="Route",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Дата обновления')),
-                ('name', models.CharField(max_length=100, verbose_name='Название маршрута')),
-                ('dispatch_country', models.CharField(max_length=100, verbose_name='Страна отправления')),
-                ('destination_country', models.CharField(max_length=100, verbose_name='Страна назначения')),
-                ('transport_type', models.CharField(choices=[('air', 'Авиационный'), ('auto', 'Автомобильный'), ('sea', 'Морской'), ('rail', 'Железнодорожный')], max_length=100, verbose_name='Тип транспорта')),
-                ('is_active', models.BooleanField(default=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        auto_now_add=True, verbose_name="Дата создания"
+                    ),
+                ),
+                (
+                    "updated_at",
+                    models.DateTimeField(auto_now=True, verbose_name="Дата обновления"),
+                ),
+                (
+                    "name",
+                    models.CharField(max_length=100, verbose_name="Название маршрута"),
+                ),
+                (
+                    "dispatch_country",
+                    models.CharField(max_length=100, verbose_name="Страна отправления"),
+                ),
+                (
+                    "destination_country",
+                    models.CharField(max_length=100, verbose_name="Страна назначения"),
+                ),
+                (
+                    "transport_type",
+                    models.CharField(
+                        choices=[
+                            ("air", "Авиационный"),
+                            ("auto", "Автомобильный"),
+                            ("sea", "Морской"),
+                            ("rail", "Железнодорожный"),
+                        ],
+                        max_length=100,
+                        verbose_name="Тип транспорта",
+                    ),
+                ),
+                ("is_active", models.BooleanField(default=True)),
             ],
             options={
-                'verbose_name_plural': 'Маршруты доставки',
-                'ordering': ['name'],
+                "verbose_name_plural": "Маршруты доставки",
+                "ordering": ["name"],
             },
         ),
     ]

@@ -5,16 +5,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('finance', '0002_initial'),
+        ("finance", "0002_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='calculationresult',
-            name='exchange_rate',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, related_name='calculation_result', to='finance.exchangerate', verbose_name='Обменный курс'),
+            model_name="calculationresult",
+            name="exchange_rate",
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="calculation_result",
+                to="finance.exchangerate",
+                verbose_name="Обменный курс",
+            ),
             preserve_default=False,
         ),
     ]
