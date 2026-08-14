@@ -1,44 +1,51 @@
 from china_calc.finance.calculators.currency_calculator import CurrencyCalculator
-
-
-class Logistic:
-    @staticmethod
-    def calculate_weight(shipment, for_client=False):
-        amount = shipment.weight * shipment.tariff_one_kg
-
-        return CurrencyCalculator.convert_currency(
-            amount=amount,
-            base_currency=shipment.tariff_currency,
-            counter_currency=shipment.settlement_final_currency,
-            exchange_rate=shipment.exchange_rate,
-            for_client=for_client,
-        )
-
-    @staticmethod
-    def calculate_volume(shipment, for_client=False):
-        amount = shipment.volume * shipment.tariff_one_m3
-
-        return CurrencyCalculator.convert_currency(
-            amount=amount,
-            base_currency=shipment.tariff_currency,
-            counter_currency=shipment.settlement_final_currency,
-            exchange_rate=shipment.exchange_rate,
-            for_client=for_client,
-        )
+from config.model_choices import LogisticCalculationMethod
 
 
 class LogisticCalculator:
-    @staticmethod
-    def calculate(shipment, for_client=False):
+    """
+    Общая стоимость логистики всей поставки
+    """
+
+    @classmethod
+    def validate(cls, shipment):
         calculation_type = shipment.logistic_calculation_type
 
-        weight_cost = Logistic.calculate_weight(shipment, for_client=for_client)
-        volume_cost = Logistic.calculate_volume(shipment, for_client=for_client)
+        if calculation_type == LogisticCalculationMethod.WEIGHT:
+            if shipment.weight <= 0:
+                raise ValueError("Вес поставки должен быть больше 0")
 
-        if calculation_type == "weight":
-            return weight_cost
+            if shipment.tariff_one_kg <= 0:
+                raise ValueError("Тариф за 1 кг должен быть больше 0")
 
-        if calculation_type == "volume":
-            return volume_cost
+            return
 
-        raise ValueError("Неизвестный способ расчета")
+        if calculation_type == LogisticCalculationMethod.VOLUME:
+            if shipment.volume <= 0:
+                raise ValueError("Объем поставки должен быть больше 0")
+
+            if shipment.tariff_one_m3 <= 0:
+                raise ValueError("Тариф за 1 м3 должен быть больше 0")
+
+            return
+
+    @classmethod
+    def calculate(cls, shipment):
+        cls.validate(shipment=shipment)
+
+        if shipment.logistic_calculation_type == LogisticCalculationMethod.WEIGHT:
+            amount = shipment.weight * shipment.tariff_one_kg
+
+        elif shipment.logistic_calculation_type == LogisticCalculationMethod.VOLUME:
+            amount = shipment.volume * shipment.tariff_one_m3
+
+        else:
+            raise ValueError("Неизвестный способ расчета логистики")
+
+        return CurrencyCalculator.convert_currency(
+            amount=amount,
+            purchase_currency=shipment.tariff_currency,
+            final_currency=shipment.settlement_final_currency,
+            exchange_rate=shipment.exchange_rate,
+            for_client=False,
+        )

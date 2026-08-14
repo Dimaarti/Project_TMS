@@ -1,9 +1,16 @@
 from django.db import models
 
-from config.models import BaseModel
+from config.base_models import BaseModel
 
 
 class ExchangeRate(BaseModel):
+    user = models.ForeignKey(
+        to="account.User",
+        on_delete=models.CASCADE,
+        related_name="exchange_rates",
+        verbose_name="Пользователь",
+    )
+
     date = models.DateField(verbose_name="Дата")
 
     cny_to_byn = models.DecimalField(
@@ -47,7 +54,9 @@ class ExchangeRate(BaseModel):
     )
 
     class Meta:
+        ordering = ["-date"]
+        verbose_name = "Обменный курс"
         verbose_name_plural = "Обменные курсы"
 
     def __str__(self):
-        return f"Обменный курс на дату - {self.date}"
+        return f"Обменные курсы на - {self.date}"

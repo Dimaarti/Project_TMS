@@ -12,12 +12,24 @@ class CurrencyCalculator:
 
     @staticmethod
     def convert_currency(
-        amount, base_currency, counter_currency, exchange_rate, for_client
+            amount, purchase_currency, final_currency, exchange_rate, for_client=False
     ):
-        if base_currency == counter_currency:
+        """
+        Переводит сумму в итоговую валюту.
+
+        for_client = True, используется только для стоимости товаров.
+        Для логистики и расходов, курс себестоимости.
+        """
+
+        if amount < 0:
+            raise ValueError("Сумма не может быть отрицательной")
+
+        if purchase_currency == final_currency:
             return amount
 
-        field = CurrencyCalculator.fields.get((base_currency, counter_currency))
+        field = CurrencyCalculator.fields.get(
+            (purchase_currency, final_currency)
+        )
 
         if field is None:
             raise ValueError("Конвертация не поддерживается")
@@ -25,8 +37,12 @@ class CurrencyCalculator:
         if for_client:
             field = f"{field}_client"
 
-        rate = getattr(exchange_rate, field)
+        rate = getattr(exchange_rate, field, None)
+
+        if rate is None:
+            raise ValueError(f"В модели обменного курса отсутствует поле - {field}")
 
         if rate <= 0:
-            raise ValueError("Курс не может быть меньше или равен 0")
+            raise ValueError("Курс должен быть больше 0")
+
         return amount * rate

@@ -1,20 +1,22 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
+from config.base_models import BaseModel
 from config.model_choices import Currency, ExpenseType
-from config.models import BaseModel
 
 
 class ShipmentExpense(BaseModel):
     shipment = models.ForeignKey(
         to="Shipment",
         on_delete=models.CASCADE,
-        related_name="expense",
+        related_name="expenses",
+        verbose_name="Поставка",
     )
 
     item = models.ForeignKey(
         to="ShipmentItem",
         on_delete=models.CASCADE,
-        related_name="expense",
+        related_name="expenses",
         null=True,
         blank=True,
         verbose_name="Конкретный товар",
@@ -27,7 +29,10 @@ class ShipmentExpense(BaseModel):
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Сумма")
 
     currency = models.CharField(
-        max_length=10, choices=Currency.choices, verbose_name="Валюта", default=Currency.USD
+        max_length=10,
+        choices=Currency.choices,
+        default=Currency.USD,
+        verbose_name="Валюта",
     )
 
     note = models.CharField(
@@ -35,8 +40,16 @@ class ShipmentExpense(BaseModel):
     )
 
     class Meta:
-        ordering = ["-amount"]
-        verbose_name_plural = "Расходы"
+        ordering = ["-created_at"]
+        verbose_name = "Расход поставки"
+        verbose_name_plural = "Расходы поставки"
 
     def __str__(self):
-        return self.expense_type
+        return self.get_expense_type_display()
+
+    def clean(self):
+        super().clean()
+        if self.item_id is not None and self.item.shipment_id != self.shipment_id:
+            raise ValidationError(
+                {"item": "Товар расхода должен принадлежать выбранной поставке."}
+            )

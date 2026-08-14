@@ -1,23 +1,27 @@
-from china_calc.finance.calculators.additional_services_calculator import (
-    AdditionalServicesCalculators,
-)
-from china_calc.finance.calculators.buyer_commission_calculator import (
-    BuyerCommissionCalculator,
-)
-from china_calc.finance.calculators.logistic_calculator import LogisticCalculator
-from china_calc.finance.calculators.purchase_calculator import PurchaseCalculator
-
-
 class ClientPriceCostCalculator:
+    """
+    Рассчитывает итоговую стоимость для клиента.
+    """
+
     @staticmethod
-    def calculate(shipment):
-        client_purchase_cost = PurchaseCalculator.calculate(shipment, for_client=True)
-        logistic_cost = LogisticCalculator.calculate(shipment)
-        additional_services_cost = AdditionalServicesCalculators.calculate(shipment)
-        buyer_commission_cost = BuyerCommissionCalculator.calculate(shipment)
+    def calculate(
+        client_purchase_cost, logistics_cost, expenses_cost, buyer_commission_cost
+    ):
+        components = [
+            client_purchase_cost,
+            logistics_cost,
+            expenses_cost,
+            buyer_commission_cost
+        ]
+
+        if any(component < 0 for component in components) :
+            raise ValueError(
+                "Составляющие клиентской стоимости не могут быть отрицательными"
+            )
+
         return (
             client_purchase_cost
-            + logistic_cost
-            + additional_services_cost
+            + logistics_cost
+            + expenses_cost
             + buyer_commission_cost
         )

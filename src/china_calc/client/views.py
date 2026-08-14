@@ -13,8 +13,6 @@ class ClientListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return (
             Client.objects.filter(user=self.request.user)
-            .select_related("user")
-            .prefetch_related("item")
             .order_by("id")
         )
 

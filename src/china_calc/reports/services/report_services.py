@@ -5,22 +5,46 @@ from openpyxl.styles import Font
 
 
 class ShipmentReportServices:
-    def __init__(self, shipment):
+    def __init__(self, shipment, client):
         self.shipment = shipment
+        self.client = client
 
     def build(self):
         items = list(
-            self.shipment.item.select_related(
-                "product",
-                "client",
-            )
+            self.shipment.items.filter(client=self.client)
+            .select_related("client")
+            .order_by("pk")
         )
 
         if not items:
-            raise ValueError("Невозможно скачать отчёт: в поставке нет товаров.")
+            raise ValueError("Невозможно скачать отчёт: у клиента нет товаров в этой поставке.")
+
+        calculation_results = (
+            self.shipment.calculation_results.filter(is_actual=True)
+            .order_by("created_at")
+            .first()
+        )
+
+        if calculation_results is None:
+            raise ValueError("Невозможно скачать отчёт: у поставки нет актуального расчета.")
+
+        client_result = (
+            calculation_results.client_results.filter(client=self.client)
+            .prefetch_related("item_results__item")
+            .first()
+        )
+
+        if client_result is None:
+            raise ValueError("Невозможно скачать отчёт: для клиента нет результатов расчета.")
+
+        item_results = {
+            result.item_id: result
+            for result in client_result.item_results.all()
+        }
+
         workbook = Workbook()
         sheet = workbook.active
-        sheet.title = "Отчет"
+        sheet.title = "Отчет клиента"
 
         sheet.append(
             [
@@ -33,173 +57,176 @@ class ShipmentReportServices:
             bold=True,
         )
 
+        sheet.append(
+            [
+                f"Клиент: {self.client.full_name}",
+            ]
+        )
+
+        sheet["A2"].font = Font(
+            name="Carlito",
+            size=13,
+            bold=True,
+        )
+
         sheet.append([None])
 
         sheet.append(
             [
                 "Маршрут",
-                "Тариф за 1 кг",
-                "Тариф за 1 м3",
-                "Валюта тарифа",
                 "Статус",
-                "Вес, кг",
-                "Объем, м3",
-                "Способ расчета логистики",
+                "Способ расчета",
+                "Тариф за 1 кг",
+                "Тариф за 1 м3"
             ]
         )
-
-        for cell in sheet[sheet.max_row]:
-            cell.font = Font(bold=True)
 
         sheet.append(
             [
                 str(self.shipment.route),
-                self.shipment.tariff_one_kg,
-                self.shipment.tariff_one_m3,
-                self.shipment.tariff_currency,
-                self.shipment.status,
-                self.shipment.weight,
-                self.shipment.volume,
+                self.shipment.get_status_display(),
                 self.shipment.get_logistic_calculation_type_display(),
+                self.shipment.tariff_one_kg,
+                self.shipment.tariff_one_m3
             ]
         )
 
-        sheet.append([None])
-        sheet.append(["Результат расчета"])
-        sheet.cell(
-            row=sheet.max_row,
-            column=1,
-        )
+        tariff_currency = str(self.shipment.tariff_currency).replace('"', "")
 
-        result = getattr(self.shipment, "calculation_result", None)
-
-        if result:
-            calculation_rows = [
-                (
-                    "Стоимость товара",
-                    result.purchase_cost,
-                    result.shipment.settlement_final_currency,
-                ),
-                (
-                    "Стоимость товара для клиента",
-                    result.client_purchase_cost,
-                    result.shipment.settlement_final_currency,
-                ),
-                (
-                    "Логистика",
-                    result.logistics_cost,
-                    result.shipment.settlement_final_currency,
-                ),
-                (
-                    "Дополнительные услуги",
-                    result.additional_services,
-                    result.shipment.settlement_final_currency,
-                ),
-                (
-                    "Комиссия байера",
-                    result.buyer_commission_cost,
-                    result.shipment.settlement_final_currency,
-                ),
-                (
-                    "Себестоимость",
-                    result.price_cost,
-                    result.shipment.settlement_final_currency,
-                ),
-                (
-                    "Итого для клиента",
-                    result.client_price_cost,
-                    result.shipment.settlement_final_currency,
-                ),
-                (
-                    "Прибыль",
-                    result.profit_cost,
-                    result.shipment.settlement_final_currency,
-                ),
-            ]
-
-            for label, value, currency in calculation_rows:
-                sheet.append([label, value, currency])
-
-            sheet.append([None])
-            sheet.append(["Товары"])
+        for column in range(4, 6):
             sheet.cell(
                 row=sheet.max_row,
-                column=1,
-            ).font = Font(bold=True)
+                column=column,
+            ).number_format = f'#,##0.00 "{tariff_currency}"'
+
+        sheet.append([None])
+
+        sheet.append(
+            [
+                "Результат расчета клиента",
+                "Сумма",
+
+            ]
+        )
+
+        calculation_rows = [
+            (
+                "Стоимость товара",
+                client_result.client_purchase_cost,
+                calculation_results.shipment.settlement_final_currency,
+            ),
+            (
+                "Логистика",
+                client_result.logistics_cost,
+                calculation_results.shipment.settlement_final_currency,
+            ),
+            (
+                "Расходы",
+                client_result.expenses_cost,
+                calculation_results.shipment.settlement_final_currency,
+            ),
+            (
+                "Комиссия",
+                client_result.buyer_commission_cost,
+                calculation_results.shipment.settlement_final_currency,
+            ),
+
+            (
+                "Итого клиенту",
+                client_result.client_price_cost,
+                calculation_results.shipment.settlement_final_currency,
+            )
+        ]
+
+
+
+
+        for label, value, currency in calculation_rows:
+            sheet.append([label, value, calculation_results.final_currency])
+
+        sheet.append([None])
+
+        sheet.append(
+            [
+                "Товар",
+                "Трек-номер",
+                "Количество",
+                "Цена",
+                "Вес, кг",
+                "Объем, м3",
+                "Стоимость товара",
+                "Логистика",
+                "Прямые расходы",
+                "Общие расходы",
+                "Итого",
+                "Ссылка",
+            ]
+        )
+
+        final_currency = str(calculation_results.final_currency)
+
+        for item in items:
+            item_result = item_results.get(item.pk)
+
+            if item_result is None:
+                raise ValueError(f"Для товара {item.pk} отсутствует результат расчета")
 
             sheet.append(
                 [
-                    "Наименование",
-                    "Клиент",
-                    "Трек-номер",
-                    "Количество",
-                    "Цена",
-                    "Валюта",
-                    "Проверка",
-                    "Фотоотчет",
-                    "Упаковка",
-                    "Ссылка",
+                    item.name,
+                    item.tracking_number,
+                    item.quantity,
+                    item.price,
+                    item.weight,
+                    item.volume,
+                    item_result.client_purchase_cost,
+                    item_result.logistics_cost,
+                    item_result.direct_expenses_cost,
+                    item_result.distributed_expenses_cost,
+                    item_result.total_cost,
+                    item.product_link
                 ]
             )
 
-            items_header_row = sheet.max_row
+            price_currency = str(item.price_currency)
 
-            for cell in sheet[items_header_row]:
-                cell.font = Font(bold=True)
+            sheet.cell(
+                row=sheet.max_row,
+                column=4,
+            ).number_format = f'#,##0.00 "{price_currency}"'
 
-            for item in self.shipment.item.all():
-                if not item:
-                    raise ValueError(
-                        "Невозможно скачать отчёт: в поставке нет товаров."
-                    )
-                else:
-                    sheet.append(
-                        [
-                            item.product.name,
-                            str(item.client),
-                            item.tracking_number,
-                            item.quantity,
-                            item.price,
-                            item.price_currency,
-                            item.inspection_cost,
-                            item.photo_report_cost,
-                            item.packaging_cost,
-                            item.product_link or "",
-                        ]
-                    )
+            for column in range(7, 12):
+                sheet.cell(
+                    row=sheet.max_row,
+                    column=column,
+                ).number_format = f'#,##0.00 "{final_currency}"'
 
-                current_row = sheet.max_row
+            if item.product_link:
+                link_cell = sheet.cell(row=sheet.max_row, column=12)
+                link_cell.hyperlink = item.product_link
+                link_cell.style = "Hyperlink"
 
-                price_cell = sheet.cell(
-                    row=current_row,
-                    column=4,
-                )
-                price_cell.number_format = "###0.00"
+        width = {
+            "A": 40,
+            "B": 18,
+            "C": 16,
+            "D": 14,
+            "E": 14,
+            "F": 12,
+            "G": 22,
+            "H": 16,
+            "I": 16,
+            "J": 16,
+            "K": 16 ,
+            "L": 18,
+            "M": 18,
+        }
 
-                link_cell = sheet.cell(
-                    row=current_row,
-                    column=10,
-                )
+        for column, width in width.items():
+            sheet.column_dimensions[column].width = width
 
-                if item.product_link:
-                    link_cell.hyperlink = item.product_link
-                    link_cell.style = "Hyperlink"
+        buffer = BytesIO()
+        workbook.save(buffer)
+        buffer.seek(0)
 
-                sheet.column_dimensions["A"].width = 42
-
-                sheet.column_dimensions["B"].width = 16
-
-                sheet.column_dimensions["C"].width = 14
-                sheet.column_dimensions["D"].width = 16
-                sheet.column_dimensions["E"].width = 10
-                sheet.column_dimensions["F"].width = 10
-                sheet.column_dimensions["G"].width = 12
-                sheet.column_dimensions["H"].width = 26
-                sheet.column_dimensions["I"].width = 10
-                sheet.column_dimensions["J"].width = 40
-
-                buffer = BytesIO()
-                workbook.save(buffer)
-                buffer.seek(0)
-
-                return buffer
+        return buffer

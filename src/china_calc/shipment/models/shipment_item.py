@@ -1,30 +1,25 @@
 from django.db import models
 
+from config.base_models import BaseModel
 from config.model_choices import Currency
-from config.models import BaseModel
 
 
 class ShipmentItem(BaseModel):
     shipment = models.ForeignKey(
         to="Shipment",
         on_delete=models.CASCADE,
-        related_name="item",
+        related_name="items",
         verbose_name="Поставка",
     )
 
     client = models.ForeignKey(
         to="client.Client",
-        on_delete=models.CASCADE,
-        related_name="item",
+        on_delete=models.PROTECT,
+        related_name="shipment_items",
         verbose_name="Клиент",
     )
 
-    product = models.ForeignKey(
-        to="Product",
-        on_delete=models.CASCADE,
-        related_name="item",
-        verbose_name="Товар",
-    )
+    name = models.CharField(max_length=100, verbose_name="Наименование товара")
 
     tracking_number = models.CharField(
         max_length=130, null=True, blank=True, verbose_name="Трек-номер"
@@ -41,28 +36,27 @@ class ShipmentItem(BaseModel):
     )
 
     price_currency = models.CharField(
-        max_length=10,
+        max_length=3,
         choices=Currency.choices,
         default=Currency.CNY,
         verbose_name="Валюта цены",
     )
 
-    inspection_cost = models.DecimalField(
-        max_digits=10, decimal_places=2, default=0, verbose_name="Проверка товара"
+    weight = models.DecimalField(
+        max_digits=10, decimal_places=4, default=0, verbose_name="Общий вес позиции, кг"
     )
 
-    photo_report_cost = models.DecimalField(
-        max_digits=10, decimal_places=2, default=0, verbose_name="Фотоотчет"
-    )
-
-    packaging_cost = models.DecimalField(
-        max_digits=10, decimal_places=2, default=0, verbose_name="Упаковка"
+    volume = models.DecimalField(
+        max_digits=10,
+        decimal_places=4,
+        default=0,
+        verbose_name="Общий объем позиции, м3",
     )
 
     class Meta:
-        ordering = ["-quantity", "-price"]
+        ordering = ["-client_id", "-name"]
         verbose_name = "Товар для отправки"
         verbose_name_plural = "Товары для отправки"
 
     def __str__(self):
-        return self.product.name
+        return f"{self.name} - {self.client.full_name}"

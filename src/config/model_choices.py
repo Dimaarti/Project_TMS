@@ -14,11 +14,16 @@ class SettlementFinalCurrency(models.TextChoices):
 
 
 class ExpenseType(models.TextChoices):
-    TRANSPORT = "transport", "Международная доставка"
-    TC = "transport_company", "Доставка транспортной компанией"
+    TRANSPORT_COMPANY = "transport_company", "Доставка транспортной компанией"
     INSURANCE = "insurance", "Страхование"
-    LOADING = "loading", "Загрузка"
-    UNLOADING = "unloading", "Отгрузка"
+    LOADING = "loading", "Погрузка"
+    UNLOADING = "unloading", "Разгрузка"
+    INSPECTION = "inspection", "Проверка товара"
+    PHOTO_REPORT = "photo_report", "Фотоотчет"
+    ITEM_PACKAGING = "item_packaging", "Упаковка товара"
+    SHIPMENT_PACKAGING = "shipments_packaging", "Упаковка посылки"
+    CUSTOMS = "customs", "Таможенные расходы"
+    STORAGE = "storage", "Хранение"
     OTHER = "other", "Прочее"
 
 
@@ -32,3 +37,32 @@ class TransportType(models.TextChoices):
     AUTO = "auto", "Автомобильный"
     SEA = "sea", "Морской"
     RAIL = "rail", "Железнодорожный"
+
+
+class ExpenseDistributionMethod(models.TextChoices):
+    LOGISTIC = (
+        "logistic",
+        "Как основная логистика",
+    )
+    WEIGHT = (
+        "weight",
+        "По весу",
+    )
+    VOLUME = (
+        "volume",
+        "По объёму",
+    )
+    PURCHASE_PRICE = (
+        "purchase_price",
+        "По стоимости товаров",
+    )
+    EQUAL_ITEMS = (
+        "equal_items",
+        "Поровну между товарами",
+    )
+
+
+class ShipmentStatus(models.TextChoices):
+    EDITE = "edite", "Редактируется"
+    CALCULATED = "calculated", "Рассчитана"
+    CLOSED = "closed", "Закрыта"

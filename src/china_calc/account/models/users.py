@@ -3,7 +3,7 @@ from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 
 from china_calc.account.managers import UserManager
-from config.models import BaseModel
+from config.base_models import BaseModel
 
 
 class User(AbstractBaseUser, PermissionsMixin, BaseModel):
@@ -34,5 +34,5 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
 
     class Meta:
         db_table = "user"
-        verbose_name_plural = "Users"
-        verbose_name = "User"
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"

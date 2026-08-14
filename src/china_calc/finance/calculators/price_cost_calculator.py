@@ -1,14 +1,13 @@
-from china_calc.finance.calculators.additional_services_calculator import (
-    AdditionalServicesCalculators,
-)
-from china_calc.finance.calculators.logistic_calculator import LogisticCalculator
-from china_calc.finance.calculators.purchase_calculator import PurchaseCalculator
-
-
 class PriceCostCalculator:
+    """
+    Рассчитывает себестоимость.
+    """
+
     @staticmethod
-    def calculate(shipment):
-        purchase_cost = PurchaseCalculator.calculate(shipment)
-        logistics_cost = LogisticCalculator.calculate(shipment)
-        additional_services = AdditionalServicesCalculators.calculate(shipment)
-        return purchase_cost + logistics_cost + additional_services
+    def calculate(purchase_cost, logistics_cost, expenses_cost):
+        components = [purchase_cost, logistics_cost, expenses_cost]
+
+        if any(component < 0 for component in components):
+            raise ValueError("Составляющие себестоимости не могут быть отрицательными")
+
+        return purchase_cost + logistics_cost + expenses_cost

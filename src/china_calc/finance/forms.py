@@ -1,28 +1,14 @@
 from django import forms
 
-from china_calc.finance.models.calculation_result import CalculationResult
 from china_calc.finance.models.exchange_rate import ExchangeRate
 
 
-class ShipmentCalculateForm(forms.ModelForm):
-    class Meta:
-        model = CalculationResult
-        fields = [
-            "exchange_rate",
-            "base_currency",
-            "counter_currency",
-            "purchase_cost",
-            "client_purchase_cost",
-            "logistics_cost",
-            "buyer_commission_cost",
-            "price_cost",
-            "client_price_cost",
-            "profit_cost",
-            "additional_services",
-        ]
-
-
 class ExchangeRateForm(forms.ModelForm):
+    def __init__(self, user=None,  *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if user is not None and not self.instance.pk:
+            self.instance.user = user
+
     class Meta:
         model = ExchangeRate
         fields = [
