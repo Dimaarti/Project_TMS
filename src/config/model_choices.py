@@ -32,6 +32,12 @@ class LogisticCalculationMethod(models.TextChoices):
     VOLUME = "volume", "По объему"
 
 
+class DeliveryRouteType(models.TextChoices):
+    CHINA_RUSSIA = "china_russia", "Китай-Россия"
+    CHINA_BELARUS = "china_belarus", "Китай-Беларусь"
+    CHINA_RUSSIA_BELARUS = "china_russia_belarus", "Китай-Россия-Беларусь"
+
+
 class TransportType(models.TextChoices):
     AIR = "air", "Авиационный"
     AUTO = "auto", "Автомобильный"
@@ -63,6 +69,6 @@ class ExpenseDistributionMethod(models.TextChoices):
 
 
 class ShipmentStatus(models.TextChoices):
-    EDITE = "edite", "Редактируется"
+    EDITING = "edite", "Редактируется"
     CALCULATED = "calculated", "Рассчитана"
     CLOSED = "closed", "Закрыта"

@@ -22,9 +22,10 @@ class ShipmentListView(LoginRequiredMixin, ListView):
     paginate_by = 5
 
     def get_queryset(self):
-        return (Shipment.objects.filter(user=self.request.user)
-                .select_related("route", "exchange_rate")
-                .order_by("pk")
+        return (
+            Shipment.objects.filter(user=self.request.user)
+            .annotate(items_count=Count("items"))
+            .order_by("-created_at")
         )
 
 
@@ -36,34 +37,27 @@ class ShipmentDetailView(LoginRequiredMixin, DetailView):
     def get_queryset(self):
         return (
             Shipment.objects.filter(user=self.request.user)
-                .select_related("route", "exchange_rate")
-                .prefetch_related("expenses", "calculation_results")
+            .select_related("exchange_rate")
+            .prefetch_related("expenses", "calculation_results")
         )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        items_queryset = (
-            self.object.items
-            .select_related("client")
-            .order_by("pk")
-        )
+        items_queryset = self.object.items.select_related("client").order_by("pk")
 
         paginator = Paginator(
             items_queryset,
             15,
         )
 
-        items_page = paginator.get_page(
-            self.request.GET.get("items_page")
-        )
+        items_page = paginator.get_page(self.request.GET.get("items_page"))
 
         context["items"] = items_page.object_list
         context["items_page"] = items_page
 
         context["actual_result"] = (
-            self.object.calculation_results
-            .filter(is_actual=True)
+            self.object.calculation_results.filter(is_actual=True)
             .order_by("-created_at")
             .first()
         )
@@ -94,7 +88,7 @@ class ShipmentCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         messages.success(
             self.request,
-            "Поставка создана.",
+            "Поставка создана",
         )
 
         return reverse(
@@ -120,7 +114,9 @@ class ShipmentUpdateView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "Редактирование поставки"
-        context["cancel_url"] = reverse("shipment:detail", kwargs={"pk": self.object.pk})
+        context["cancel_url"] = reverse(
+            "shipment:detail", kwargs={"pk": self.object.pk}
+        )
         return context
 
     def get_success_url(self):
@@ -141,21 +137,20 @@ class ShipmentDeleteView(LoginRequiredMixin, DeleteView):
     def get_queryset(self):
         return (
             Shipment.objects.filter(user=self.request.user)
-            .select_related("route", "exchange_rate")
+            .select_related("exchange_rate")
             .annotate(items_count=Count("items"))
             .order_by("-created_at")
-
         )
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "Удаление поставки"
         context["delete_mode"] = True
-        context["cancel_url"] = reverse("shipment:detail", kwargs={"pk": self.object.pk})
+        context["cancel_url"] = reverse(
+            "shipment:detail", kwargs={"pk": self.object.pk}
+        )
         return context
 
     def get_success_url(self):
         messages.success(self.request, "Поставка успешно удалена")
         return reverse("shipment:list")
-

@@ -1,13 +1,18 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import ProtectedError, Sum
+from django.db.models import Count, Prefetch, ProtectedError, Sum
 from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import DetailView, ListView, CreateView, DeleteView
-from pygments.lexer import default
+from django.views.generic import CreateView, DeleteView, DetailView, ListView
 
-from china_calc.finance.forms import ExchangeRateForm
+from china_calc.client.models import Client
+from china_calc.finance.forms import ClientPaymentForm, ExchangeRateForm
+from china_calc.finance.models import (
+    ClientCalculationResult,
+    ClientPayment,
+    ItemCalculationResult,
+)
 from china_calc.finance.models.calculation_result import CalculationResult
 from china_calc.finance.models.exchange_rate import ExchangeRate
 from china_calc.finance.services.shipment_calculate_service import (
@@ -41,7 +46,7 @@ class ShipmentCalculateView(LoginRequiredMixin, View):
 
         messages.success(
             request,
-            "Расчёт поставки выполнен.",
+            "Расчёт поставки выполнен",
         )
 
         return redirect(
@@ -56,7 +61,16 @@ class ExchangeRateListView(LoginRequiredMixin, ListView):
     context_object_name = "exchange_rate"
 
     def get_queryset(self):
-        return ExchangeRate.objects.filter(user=self.request.user).order_by("-date")
+        return (
+            ExchangeRate.objects.filter(user=self.request.user)
+            .annotate(
+                shipment_count=Count(
+                    "shipments",
+                    distinct=True,
+                )
+            )
+            .order_by("-date", "-pk")
+        )
 
 
 class ExchangeRateDetailView(LoginRequiredMixin, DetailView):
@@ -80,7 +94,7 @@ class ExchangeRateCreateView(LoginRequiredMixin, CreateView):
         return kwargs
 
     def form_valid(self, form):
-        messages.success(self.request, "Курсы валют успешно добавлены.")
+        messages.success(self.request, "Курсы валют успешно добавлены")
         return super().form_valid(form)
 
 
@@ -95,9 +109,9 @@ class ExchangeRateDeleteView(LoginRequiredMixin, DeleteView):
         try:
             response = super().form_valid(form)
         except ProtectedError:
-            messages.error(self.request, "Курс используется в поставках.")
+            messages.error(self.request, "Курс используется в поставках")
             return redirect("finance:rate_list")
-        messages.success(self.request, "Курс валют удален.")
+        messages.success(self.request, "Курс валют удален")
         return response
 
 
@@ -105,7 +119,7 @@ class CalculationResultListView(LoginRequiredMixin, ListView):
     model = CalculationResult
     template_name = "finance/calculation_result_list.html"
     context_object_name = "results"
-    paginate_by = 20
+    paginate_by = 10
 
     def get_queryset(self):
         return (
@@ -121,20 +135,26 @@ class CalculationResultDetailView(LoginRequiredMixin, DetailView):
     context_object_name = "result"
 
     def get_queryset(self):
+        item_result = ItemCalculationResult.objects.select_related("item").order_by(
+            "item__name", "pk"
+        )
+
+        client_results = (
+            ClientCalculationResult.objects.select_related("client")
+            .annotate(total_weight=Sum("item_results__item__weight", default=0))
+            .prefetch_related(Prefetch("item_results", queryset=item_result))
+            .order_by("client__full_name", "pk")
+        )
+
         return (
             CalculationResult.objects.filter(shipment__user=self.request.user)
             .select_related("shipment", "exchange_rate")
-            .prefetch_related("client_results__client", "client_results__item_results__item")
+            .prefetch_related(Prefetch("client_results", queryset=client_results))
         )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["client_results"] = (
-            self.object.client_results
-            .select_related("client")
-            .prefetch_related("item_results__item")
-            .annotate(total_weight=Sum("item_results__item__weight", default=0))
-        )
+        context["client_results"] = self.object.client_results.all()
 
         return context
 
@@ -153,12 +173,70 @@ class CalculationResultDeleteView(LoginRequiredMixin, DeleteView):
         if self.object.is_actual:
             messages.error(
                 self.request,
-                "Актуальный результат расчёта удалить нельзя.",
+                "Актуальный результат расчёта удалить нельзя",
             )
             return redirect("finance:calculations_list")
 
         messages.success(
             self.request,
-            "Результат расчёта удалён.",
+            "Результат расчёта удалён",
         )
         return super().form_valid(form)
+
+
+class ClientPaymentCreateView(LoginRequiredMixin, CreateView):
+    model = ClientPayment
+    form_class = ClientPaymentForm
+    template_name = "universal_form.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.shipment = get_object_or_404(
+            Shipment,
+            pk=kwargs["shipment_pk"],
+            user=request.user,
+        )
+
+        self.client = get_object_or_404(
+            Client.objects.filter(
+                user=self.request.user,
+                shipment_items__shipment=self.shipment,
+            ).distinct(),
+            pk=kwargs["client_pk"],
+        )
+
+        self.calculation_result = get_object_or_404(
+            self.shipment.calculation_results,
+            is_actual=True,
+        )
+
+        self.client_result = get_object_or_404(
+            self.calculation_result.client_results,
+            client=self.client,
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.shipment = self.shipment
+        form.instance.client = self.client
+        form.instance.currency = self.calculation_result.final_currency
+
+        messages.success(self.request, "Оплата клиента добавлена")
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = f"Оплата клиента {self.client.full_name}"
+        context["subtitle"] = f"Поставка №{self.shipment.number}"
+        context["submit_text"] = "Добавить оплату"
+        context["delete_mode"] = False
+        context["cancel_url"] = reverse(
+            "finance:calculations_detail",
+            kwargs={"pk": self.calculation_result.pk},
+        )
+        return context
+
+    def get_success_url(self):
+        return reverse(
+            "finance:calculations_detail",
+            kwargs={"pk": self.calculation_result.pk},
+        )

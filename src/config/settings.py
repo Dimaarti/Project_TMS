@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     "china_calc.account",
     "china_calc.client",
     "china_calc.shipment",
-    "china_calc.logistics",
     "china_calc.finance",
     "china_calc.reports",
 ]

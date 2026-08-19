@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from config.base_models import BaseModel
@@ -43,12 +44,12 @@ class ShipmentItem(BaseModel):
     )
 
     weight = models.DecimalField(
-        max_digits=10, decimal_places=4, default=0, verbose_name="Общий вес позиции, кг"
+        max_digits=10, decimal_places=3, default=0, verbose_name="Общий вес позиции, кг"
     )
 
     volume = models.DecimalField(
         max_digits=10,
-        decimal_places=4,
+        decimal_places=3,
         default=0,
         verbose_name="Общий объем позиции, м3",
     )
@@ -60,3 +61,14 @@ class ShipmentItem(BaseModel):
 
     def __str__(self):
         return f"{self.name} - {self.client.full_name}"
+
+    def clean(self):
+        super().clean()
+
+        if not self.shipment_id or not self.client_id:
+            return
+
+        if self.shipment.user_id != self.client.user_id:
+            raise ValidationError(
+                {"client": "Клиент и поставка должны принадлежать одному пользователю"}
+            )

@@ -48,6 +48,14 @@ class CalculationResult(BaseModel):
         max_digits=16, decimal_places=2, default=0, verbose_name="Логистические расходы"
     )
 
+    logistics_cost_rub = models.DecimalField(
+        max_digits=16,
+        decimal_places=2,
+        default=0,
+        editable=False,
+        verbose_name="Общая стоимость доставки в RUB",
+    )
+
     buyer_commission_cost = models.DecimalField(
         max_digits=16,
         decimal_places=2,

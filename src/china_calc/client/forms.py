@@ -4,11 +4,6 @@ from china_calc.client.models import Client
 
 
 class ClientForm(forms.ModelForm):
-    def clean_full_name(self):
-        return self.cleaned_data["full_name"]
-    def clean_phone(self):
-        return self.cleaned_data["phone"]
-
     class Meta:
         model = Client
         fields = [

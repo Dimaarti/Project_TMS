@@ -40,7 +40,9 @@ class ShipmentExpenseCreateView(LoginRequiredMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context["title"] = "Новый расход"
         context["shipment"] = self.shipment
-        context["cancel_url"] = reverse("shipment:detail", kwargs={"pk": self.shipment.pk})
+        context["cancel_url"] = reverse(
+            "shipment:detail", kwargs={"pk": self.shipment.pk}
+        )
         return context
 
     def form_valid(self, form):
@@ -51,10 +53,8 @@ class ShipmentExpenseCreateView(LoginRequiredMixin, CreateView):
 
         messages.success(
             self.request,
-            "Расход добавлен.",
+            "Расход добавлен",
         )
-
-
 
         return response
 
@@ -80,9 +80,11 @@ class ShipmentExpenseUpdateView(LoginRequiredMixin, UpdateView):
         return context
 
     def get_queryset(self):
-        return (
-            ShipmentExpense.objects.filter(shipment__user=self.request.user)
-            .select_related("shipment", "item", )
+        return ShipmentExpense.objects.filter(
+            shipment__user=self.request.user
+        ).select_related(
+            "shipment",
+            "item",
         )
 
     def get_form_kwargs(self):
@@ -94,7 +96,7 @@ class ShipmentExpenseUpdateView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         messages.success(
             self.request,
-            "Расход обновлён.",
+            "Расход обновлён",
         )
 
         return reverse(
@@ -128,7 +130,7 @@ class ShipmentExpenseDeleteView(LoginRequiredMixin, DeleteView):
 
         messages.success(
             self.request,
-            "Расход удалён.",
+            "Расход удалён",
         )
 
         return reverse(
@@ -137,4 +139,6 @@ class ShipmentExpenseDeleteView(LoginRequiredMixin, DeleteView):
         )
 
     def get_queryset(self):
-        return ShipmentExpense.objects.filter(shipment__user=self.request.user).select_related("shipment")
+        return ShipmentExpense.objects.filter(
+            shipment__user=self.request.user
+        ).select_related("shipment")

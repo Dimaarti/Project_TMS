@@ -4,9 +4,11 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic import CreateView, DeleteView, UpdateView
 
-from china_calc.finance.calculators.shipment_cargo_calculator import ShipmentCargoCalculator
+from china_calc.finance.calculators.shipment_cargo_calculator import (
+    ShipmentCargoCalculator,
+)
 from china_calc.shipment.forms import ShipmentItemForm
-from china_calc.shipment.models import ShipmentItem, Shipment
+from china_calc.shipment.models import Shipment, ShipmentItem
 
 
 class ShipmentItemCreateView(LoginRequiredMixin, CreateView):
@@ -16,9 +18,7 @@ class ShipmentItemCreateView(LoginRequiredMixin, CreateView):
 
     def dispatch(self, request, *args, **kwargs):
         self.shipment = get_object_or_404(
-            Shipment,
-            pk=kwargs["shipment_pk"],
-            user=request.user
+            Shipment, pk=kwargs["shipment_pk"], user=request.user
         )
         return super().dispatch(request, *args, **kwargs)
 
@@ -26,7 +26,6 @@ class ShipmentItemCreateView(LoginRequiredMixin, CreateView):
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
         return kwargs
-
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -39,8 +38,7 @@ class ShipmentItemCreateView(LoginRequiredMixin, CreateView):
         context["shipment"] = self.shipment
         context["title"] = "Новый товар"
         context["cancel_url"] = reverse(
-            "shipment:detail",
-            kwargs={"pk": self.shipment.pk}
+            "shipment:detail", kwargs={"pk": self.shipment.pk}
         )
         return context
 
@@ -57,7 +55,7 @@ class ShipmentItemCreateView(LoginRequiredMixin, CreateView):
 
         messages.success(
             self.request,
-            "Товар добавлен. Вес и объём поставки пересчитаны.",
+            "Товар добавлен. Вес и объём поставки пересчитаны",
         )
 
         return response
@@ -76,7 +74,6 @@ class ShipmentItemUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_queryset(self):
         return ShipmentItem.objects.filter(shipment__user=self.request.user)
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -106,15 +103,13 @@ class ShipmentItemUpdateView(LoginRequiredMixin, UpdateView):
 
         messages.success(
             self.request,
-            "Товар обновлён. Вес и объём поставки пересчитаны.",
+            "Товар обновлён. Вес и объём поставки пересчитаны",
         )
 
         return response
 
     def get_success_url(self):
         return reverse("shipment:detail", kwargs={"pk": self.object.shipment_id})
-
-
 
 
 class ShipmentItemDeleteView(LoginRequiredMixin, DeleteView):
@@ -131,10 +126,10 @@ class ShipmentItemDeleteView(LoginRequiredMixin, DeleteView):
         )
         return context
 
-
-
     def get_queryset(self):
-        return ShipmentItem.objects.filter(shipment__user=self.request.user).select_related("shipment")
+        return ShipmentItem.objects.filter(
+            shipment__user=self.request.user
+        ).select_related("shipment")
 
     def form_valid(self, form):
         shipment = self.object.shipment
@@ -154,9 +149,7 @@ class ShipmentItemDeleteView(LoginRequiredMixin, DeleteView):
 
         messages.success(
             self.request,
-            "Товар удалён. Вес и объём поставки пересчитаны.",
+            "Товар удалён. Вес и объём поставки пересчитаны",
         )
 
         return response
-
-

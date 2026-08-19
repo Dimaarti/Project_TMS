@@ -13,12 +13,12 @@ class ShipmentForm(forms.ModelForm):
         model = Shipment
         fields = [
             "number",
-            "route",
+            "route_type",
+            "transport_type",
             "exchange_rate",
             "tariff_one_kg",
             "tariff_one_m3",
             "tariff_currency",
-            "settlement_final_currency",
             "status",
             "logistic_calculation_type",
             "note",
@@ -26,12 +26,12 @@ class ShipmentForm(forms.ModelForm):
 
         widgets = {
             "number": forms.TextInput(attrs={"class": "form-control"}),
-            "route": forms.Select(attrs={"class": "form-select"}),
+            "route_type": forms.Select(attrs={"class": "form-select"}),
+            "transport_type": forms.Select(attrs={"class": "form-select"}),
             "exchange_rate": forms.Select(attrs={"class": "form-select"}),
             "tariff_one_kg": forms.NumberInput(attrs={"class": "form-control"}),
             "tariff_one_m3": forms.NumberInput(attrs={"class": "form-control"}),
             "tariff_currency": forms.Select(attrs={"class": "form-select"}),
-            "settlement_final_currency": forms.Select(attrs={"class": "form-select"}),
             "status": forms.Select(attrs={"class": "form-select"}),
             "logistic_calculation_type": forms.Select(attrs={"class": "form-select"}),
             "note": forms.Textarea(attrs={"class": "form-control"}),
@@ -78,7 +78,6 @@ class ShipmentExpenseForm(forms.ModelForm):
 
         if shipment is not None:
             self.fields["item"].queryset = shipment.items.all()
-
 
     class Meta:
         model = ShipmentExpense

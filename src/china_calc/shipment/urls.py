@@ -28,7 +28,11 @@ urlpatterns = [
     path("<int:pk>/delete/", ShipmentDeleteView.as_view(), name="delete"),
     path("<int:pk>/", ShipmentDetailView.as_view(), name="detail"),
     path("<int:pk>/calculate/", ShipmentCalculateView.as_view(), name="calculate"),
-    path("<int:shipment_pk>/items/create/", ShipmentItemCreateView.as_view(), name="item_create"),
+    path(
+        "<int:shipment_pk>/items/create/",
+        ShipmentItemCreateView.as_view(),
+        name="item_create",
+    ),
     path(
         "items/<int:pk>/update/", ShipmentItemUpdateView.as_view(), name="item_update"
     ),

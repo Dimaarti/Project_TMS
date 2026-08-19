@@ -55,8 +55,11 @@ class LogisticAllocationCalculator:
     """
 
     @classmethod
-    def calculate(cls, shipment):
-        items = list(shipment.items.select_related("client").order_by("pk"))
+    def calculate(cls, shipment, items=None):
+        if items is None:
+            items = list(shipment.items.select_related("client").order_by("pk"))
+        else:
+            items = list(items)
 
         if not items:
             raise ValueError("Отсутствуют товары в поставке ")
@@ -126,7 +129,7 @@ class LogisticAllocationCalculator:
         for item in items:
             basis = basis_item[item.pk]
             ratio = basis / total_basis
-            percent = ratio * 100
+            percent = ratio * Decimal(100)
 
             result[item.pk] = ItemLogisticAllocation(
                 item_id=item.pk,
@@ -153,7 +156,7 @@ class LogisticAllocationCalculator:
 
         for client_id, basis in basis_client.items():
             ratio = basis / total_basis
-            percent = ratio * 100
+            percent = ratio * Decimal(100)
 
             result[client_id] = ClientLogisticAllocation(
                 client_id=client_id,

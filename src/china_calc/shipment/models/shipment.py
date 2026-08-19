@@ -1,12 +1,13 @@
-
 from django.db import models
 
 from config.base_models import BaseModel
 from config.model_choices import (
     Currency,
+    DeliveryRouteType,
     LogisticCalculationMethod,
     SettlementFinalCurrency,
     ShipmentStatus,
+    TransportType,
 )
 
 
@@ -18,18 +19,25 @@ class Shipment(BaseModel):
         verbose_name="Пользователь",
     )
 
-    route = models.ForeignKey(
-        to="logistics.Route",
-        on_delete=models.PROTECT,
-        related_name="shipments",
+    route_type = models.CharField(
+        max_length=40,
+        choices=DeliveryRouteType.choices,
+        default=DeliveryRouteType.CHINA_BELARUS,
         verbose_name="Маршрут поставки",
+    )
+
+    transport_type = models.CharField(
+        max_length=30,
+        choices=TransportType.choices,
+        default=TransportType.AUTO,
+        verbose_name="Тип транспорта",
     )
 
     exchange_rate = models.ForeignKey(
         to="finance.ExchangeRate",
         on_delete=models.PROTECT,
         related_name="shipments",
-        verbose_name="Обменные курсы валют",
+        verbose_name="Обменный курс валют",
     )
 
     number = models.CharField(max_length=30, verbose_name="Номер поставки")
@@ -37,7 +45,7 @@ class Shipment(BaseModel):
     status = models.CharField(
         max_length=20,
         choices=ShipmentStatus,
-        default=ShipmentStatus.EDITE,
+        default=ShipmentStatus.EDITING,
         verbose_name="Статус поставки",
     )
 
@@ -50,7 +58,7 @@ class Shipment(BaseModel):
 
     weight = models.DecimalField(
         max_digits=10,
-        decimal_places=2,
+        decimal_places=3,
         default=0,
         verbose_name="Фактический вес поставки, кг",
     )
@@ -71,9 +79,9 @@ class Shipment(BaseModel):
     )
 
     tariff_currency = models.CharField(
-        max_length=10,
+        max_length=3,
         choices=Currency.choices,
-        default="USD",
+        default=Currency.USD,
         verbose_name="Валюта тарифа",
     )
 
@@ -81,6 +89,7 @@ class Shipment(BaseModel):
         max_length=10,
         choices=SettlementFinalCurrency.choices,
         default=SettlementFinalCurrency.BYN,
+        editable=False,
         verbose_name="Валюта итогового расчета",
     )
 
@@ -103,6 +112,24 @@ class Shipment(BaseModel):
     def __str__(self):
         return self.number
 
+    @property
+    def route_final_currency(self):
+        if self.route_type == DeliveryRouteType.CHINA_RUSSIA:
+            return SettlementFinalCurrency.RUB
+        return SettlementFinalCurrency.BYN
+
+    def clean(self):
+        super().clean()
+        self.settlement_final_currency = self.route_final_currency
+
+    def save(self, *args, **kwargs):
+        self.settlement_final_currency = self.route_final_currency
+
+        update_fields = kwargs.get("update_fields")
+
+        if update_fields is not None:
+            kwargs["update_fields"] = set(update_fields) | {"settlement_final_currency"}
+        super().save(*args, **kwargs)
+
     def invalidate_calculations(self):
-        """Помечает предыдущий расчёт неактуальным после изменения поставки."""
         self.calculation_results.filter(is_actual=True).update(is_actual=False)
