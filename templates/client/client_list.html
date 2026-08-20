@@ -1,105 +1,282 @@
 {% extends "base.html" %}
 
+{% block title %}
+    Клиенты
+{% endblock %}
+
 {% block content %}
 <div class="container py-4">
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-        <div>
-            <h1 class="mb-1">
-                Клиенты
-            </h1>
+    {% with client_list=clients|default:clients %}
+        {# Заголовок страницы #}
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+            <div>
+                <h1 class="h3 mb-1">
+                    Клиенты
+                </h1>
 
-            <div class="text-muted">
-                Список клиентов и условия комиссии
+                <div class="text-muted">
+                    Контакты, поставки и состояние оплаты
+                </div>
             </div>
-        </div>
 
-        <a
+            <a
                 href="{% url 'client:create' %}"
                 class="btn btn-primary"
-        >
-            Добавить клиента
-        </a>
-    </div>
+            >
+                Новый клиент
+            </a>
+        </div>
 
-    {% if client %}
-    <div class="row g-4">
+        {# Заголовок списка #}
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h2 class="h5 mb-0">
+                Все клиенты
+            </h2>
 
-        {% for item in client %}
-        <div class="col-12 col-md-6 col-xl-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3">
-                    <div class="d-flex justify-content-between align-items-center gap-3">
-                        <div class="d-flex align-items-center gap-3">
-                            <div
-                                    class="rounded-circle bg-primary text-white
-                                               d-flex align-items-center justify-content-center
-                                               fw-bold"
-                                    style="width: 42px; height: 42px;"
-                            >
-                                {{ item.full_name|slice:":1"|upper }}
-                            </div>
+            <span class="badge text-bg-light border text-dark">
+                {{ client_list|length }}
+            </span>
+        </div>
 
-                            <div>
-                                <h5 class="mb-0">
-                                    {{ item.full_name }}
-                                </h5>
+        {# Список клиентов #}
+        {% for client in client_list %}
+            <div class="card shadow-sm mb-3">
+                {# Информация о клиенте #}
+                <div class="card-body">
+                    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                        <div class="flex-grow-1">
+                            <h3 class="h6 fw-semibold mb-3">
+                                {{ client.full_name }}
+                            </h3>
 
-                                <div class="text-muted small">
-                                    Клиент
+                            <div class="row g-3">
+                                {# Телефон #}
+                                <div class="col-sm-6 col-lg-4">
+                                    <div class="small text-muted mb-1">
+                                        Телефон
+                                    </div>
+
+                                    {% if client.phone %}
+                                        <a
+                                            href="tel:{{ client_object.phone }}"
+                                            class="text-decoration-none text-body"
+                                        >
+                                            {{ client.phone }}
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted">
+                                            Не указан
+                                        </span>
+                                    {% endif %}
+                                </div>
+
+                                {# Адрес #}
+                                <div class="col-sm-6 col-lg-5">
+                                    <div class="small text-muted mb-1">
+                                        Адрес
+                                    </div>
+
+                                    {% if client.address %}
+                                        <div>
+                                            {{ client.address }}
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted">
+                                            Не указан
+                                        </span>
+                                    {% endif %}
+                                </div>
+
+                                {# Комиссия #}
+                                <div class="col-sm-6 col-lg-3">
+                                    <div class="small text-muted mb-1">
+                                        Комиссия
+                                    </div>
+
+                                    <div class="fw-semibold">
+                                        {{ client.buyer_commission_percent|floatformat:2 }}%
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <span class="badge text-bg-success">
-                                    {{ item.buyer_commission_percent }}%
-                                </span>
-
-                    </div>
-                </div>
-
-
-                <div class="card-body">
-
-                    <div class="mb-3">
-                        <div class="text-muted small">
-                            Телефон
-                        </div>
-
-                        <div class="fw-semibold">
-                            {% if item.phone %}
+                        {# Действия клиента #}
+                        <div>
                             <a
-                                    href="tel:{{ item.phone }}"
-                                    class="text-decoration-none"
+                                href="{% url 'client:update' client.pk %}"
+                                class="btn btn-sm btn-outline-secondary"
                             >
-                                {{ item.phone }}
+                                Изменить
                             </a>
-                            {% endif %}
                         </div>
                     </div>
-
-                    <div class="mb-3">
-                        <div class="text-muted small">
-                            Адрес
-                        </div>
-
-                        <div class="fw-semibold">
-                            {{ item.address|default:"Не указан" }}
-                        </div>
-                    </div>
-
-
                 </div>
 
+                {# Поставки и оплаты клиента #}
+                {% if client.payment_results %}
+                    <div class="border-top">
+                        {% for payment_result in client.payment_results %}
+                            <div class="p-3 {% if not forloop.last %}border-bottom{% endif %}">
+                                <div class="row g-3 align-items-center">
+                                    {# Поставка #}
+                                    <div class="col-6 col-md-4 col-xl-2">
+                                        <div class="small text-muted mb-1">
+                                            Поставка
+                                        </div>
+
+                                        <div class="fw-semibold">
+                                            №{{ payment_result.calculation_result.shipment.number }}
+                                        </div>
+
+                                        <div class="small text-muted">
+                                            {{ payment_result.calculation_result.created_at|date:"d.m.Y H:i" }}
+                                        </div>
+                                    </div>
+
+                                    {# Итого #}
+                                    <div class="col-6 col-md-4 col-xl-2">
+                                        <div class="small text-muted mb-1">
+                                            Итого
+                                        </div>
+
+                                        <div class="fw-semibold">
+                                            {{ payment_result.total_amount|floatformat:2 }}
+                                            {{ payment_result.calculation_result.final_currency }}
+                                        </div>
+                                    </div>
+
+                                    {# Оплачено #}
+                                    <div class="col-6 col-md-4 col-xl-2">
+                                        <div class="small text-muted mb-1">
+                                            Оплачено
+                                        </div>
+
+                                        <div class="fw-semibold text-success">
+                                            {{ payment_result.paid_amount|floatformat:2 }}
+                                            {{ payment_result.calculation_result.final_currency }}
+                                        </div>
+                                    </div>
+
+                                    {# Долг или переплата #}
+                                    <div class="col-6 col-md-4 col-xl-2">
+                                        {% if payment_result.overpayment_amount > 0 %}
+                                            <div class="small text-muted mb-1">
+                                                Переплата
+                                            </div>
+
+                                            <div class="fw-semibold text-info">
+                                                {{ payment_result.overpayment_amount|floatformat:2 }}
+                                                {{ payment_result.calculation_result.final_currency }}
+                                            </div>
+                                        {% else %}
+                                            <div class="small text-muted mb-1">
+                                                Осталось оплатить
+                                            </div>
+
+                                            <div
+                                                class="fw-semibold
+                                                {% if payment_result.debt_amount > 0 %}
+                                                    text-danger
+                                                {% else %}
+                                                    text-success
+                                                {% endif %}"
+                                            >
+                                                {{ payment_result.debt_amount|floatformat:2 }}
+                                                {{ payment_result.calculation_result.final_currency }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    {# Статус #}
+                                    <div class="col-6 col-md-4 col-xl-2">
+                                        <div class="small text-muted mb-1">
+                                            Статус
+                                        </div>
+
+                                        {% if payment_result.overpayment_amount > 0 %}
+                                            <span class="badge text-bg-info">
+                                                Переплата
+                                            </span>
+                                        {% elif payment_result.debt_amount > 0 %}
+                                            {% if payment_result.paid_amount > 0 %}
+                                                <span class="badge text-bg-warning">
+                                                    Оплачено частично
+                                                </span>
+                                            {% else %}
+                                                <span class="badge text-bg-danger">
+                                                    Не оплачено
+                                                </span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="badge text-bg-success">
+                                                Оплачено полностью
+                                            </span>
+                                        {% endif %}
+                                    </div>
+
+                                    {# Действия по поставке #}
+                                    <div class="col-12 col-md-8 col-xl-2">
+                                        <div class="d-flex flex-wrap justify-content-xl-end gap-2">
+                                            {% if payment_result.debt_amount > 0 %}
+                                                <a
+                                                    href="{% url 'finance:client_payment_create' shipment_pk=payment_result.calculation_result.shipment_id client_pk=client_object.pk %}"
+                                                    class="btn btn-sm btn-primary"
+                                                >
+                                                    Добавить оплату
+                                                </a>
+                                            {% endif %}
+
+                                            <a
+                                                href="{% url 'finance:calculations_detail' pk=payment_result.calculation_result_id %}"
+                                                class="btn btn-sm btn-outline-secondary"
+                                            >
+                                                Открыть расчёт
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {# У клиента пока нет актуального расчёта #}
+                    <div class="card-body border-top py-3">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <span class="small text-muted">
+                                У клиента пока нет актуальных расчётов.
+                            </span>
+
+                            <a
+                                href="{% url 'shipment:list' %}"
+                                class="btn btn-sm btn-outline-secondary"
+                            >
+                                К поставкам
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
-        </div>
+        {% empty %}
+            {# Клиентов ещё нет #}
+            <div class="card shadow-sm">
+                <div class="card-body text-center py-5">
+                    <h2 class="h5 mb-2">
+                        Клиентов пока нет
+                    </h2>
+
+                    <p class="text-muted mb-3">
+                        Добавьте первого клиента, чтобы создавать для него товары и оплаты.
+                    </p>
+
+                    <a
+                        href="{% url 'client:create' %}"
+                        class="btn btn-primary"
+                    >
+                        Добавить клиента
+                    </a>
+                </div>
+            </div>
         {% endfor %}
-
-    </div>
-    {% else %}
-    <div class="alert alert-info">
-        Клиентов пока нет.
-    </div>
-    {% endif %}
-
+    {% endwith %}
 </div>
 {% endblock %}

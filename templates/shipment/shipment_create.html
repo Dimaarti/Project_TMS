@@ -1,63 +1,244 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 
+{% block title %}{{ title }}{% endblock %}
+
 {% block content %}
-<div class="container py-4">
+<div class="container py-3">
+    <div class="mx-auto" style="max-width: 960px;">
 
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-10 col-lg-8 col-xl-7">
+        {# Заголовок #}
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-1">
+                    {{ title }}
+                </h1>
 
-            <div class="card border-0 shadow-sm">
+                <div class="small text-muted">
+                    Основные параметры поставки и логистики
+                </div>
+            </div>
 
-                <div class="card-header bg-white py-3">
-                    <h1 class="h4 mb-1">
-                        Создание
-                    </h1>
+            <a
+                    href="{{ cancel_url }}"
+                    class="btn btn-sm btn-outline-secondary"
+            >
+                Отмена
+            </a>
+        </div>
 
-                    <div class="text-muted small">
-                        Заполните необходимые поля
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <div class="bg-white border rounded-3 p-4">
+
+                {# Общие ошибки #}
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger py-2">
+                    {% for error in form.non_field_errors %}
+                    <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {# Основные данные #}
+                <div class="mb-4">
+                    <h2 class="h6 mb-3">
+                        Основные данные
+                    </h2>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            {{ form.number|as_crispy_field }}
+                        </div>
+
+                        <div class="col-md-6">
+                            {{ form.route_type|as_crispy_field }}
+
+                            <div class="form-text">
+                                Итоговая валюта и последовательность конвертации
+                                определяются выбранным маршрутом.
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            {{ form.transport_type|as_crispy_field }}
+                        </div>
+
+                        <div class="col-md-4">
+                            {{ form.exchange_rate|as_crispy_field }}
+                        </div>
                     </div>
                 </div>
 
-                <div class="card-body p-4">
-                    <form method="post">
-                        {% csrf_token %}
+                <hr class="my-4">
 
-                        {% for hidden_field in form.hidden_fields %}
-                            {{ hidden_field }}
-                        {% endfor %}
+                {# Логистика #}
+                <div class="mb-4">
+                    <h2 class="h6 mb-3">
+                        Логистика
+                    </h2>
 
-                        {% if form.non_field_errors %}
-                            <div class="alert alert-danger">
-                                {{ form.non_field_errors }}
-                            </div>
-                        {% endif %}
-
-                        {{ form|crispy }}
-
-                        <div class="d-flex justify-content-end gap-2 mt-4">
-                            <button
-                                type="button"
-                                class="btn btn-outline-secondary"
-                                onclick="history.back()"
-                            >
-                                Отмена
-                            </button>
-
-                            <button
-                                type="submit"
-                                class="btn btn-success"
-                            >
-                                Создать
-                            </button>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            {{ form.logistic_calculation_type|as_crispy_field }}
                         </div>
-                    </form>
+
+                        <div class="col-md-4">
+                            {{ form.tariff_one_kg|as_crispy_field }}
+                        </div>
+
+                        <div class="col-md-4">
+                            {{ form.tariff_one_m3|as_crispy_field }}
+                        </div>
+
+                        <div class="col-md-6">
+                            {{ form.tariff_currency|as_crispy_field }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Валюта итогового расчёта
+                            </label>
+
+                            <div
+                                    id="final-currency-preview"
+                                    class="form-control bg-light"
+                            >
+                                Определяется выбранным маршрутом
+                            </div>
+
+                            <div class="form-text">
+                                Россия — RUB, Беларусь — BYN
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
+                <hr class="my-4">
+
+                {# Параметры груза #}
+                <div>
+                    <h2 class="h6 mb-1">
+                        Параметры груза
+                    </h2>
+
+                    <div class="small text-muted mb-3">
+                        Вес и объём рассчитываются автоматически по товарам поставки.
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="border rounded-3 p-3 h-100 bg-light">
+                                <div class="small text-muted mb-1">
+                                    Общий вес
+                                </div>
+
+                                <div class="fs-5 fw-semibold">
+                                    {% if object %}
+                                    {{ object.weight|default:"0" }} кг
+                                    {% else %}
+                                    0 кг
+                                    {% endif %}
+                                </div>
+
+                                <div class="small text-muted mt-1">
+                                    Сумма веса товаров
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="border rounded-3 p-3 h-100 bg-light">
+                                <div class="small text-muted mb-1">
+                                    Общий объём
+                                </div>
+
+                                <div class="fs-5 fw-semibold">
+                                    {% if object %}
+                                    {{ object.volume|default:"0" }} м³
+                                    {% else %}
+                                    0 м³
+                                    {% endif %}
+                                </div>
+
+                                <div class="small text-muted mt-1">
+                                    Сумма объёма товаров
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            {{ form.status|as_crispy_field }}
+                        </div>
+
+                        <div class="col-12">
+                            {{ form.note|as_crispy_field }}
+                        </div>
+                    </div>
+                </div>
+
+                {# Действия #}
+                <div class="d-flex justify-content-end gap-2 border-top pt-3 mt-4">
+                    <a
+                            href="{{ cancel_url }}"
+                            class="btn btn-outline-secondary"
+                    >
+                        Отмена
+                    </a>
+
+                    <button
+                            type="submit"
+                            class="btn btn-primary"
+                    >
+                        {% if object %}
+                        Сохранить
+                        {% else %}
+                        Создать поставку
+                        {% endif %}
+                    </button>
+                </div>
             </div>
-
-        </div>
+        </form>
     </div>
-
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const routeField = document.getElementById("id_route_type");
+        const currencyPreview = document.getElementById(
+            "final-currency-preview"
+        );
+
+        function updateFinalCurrency() {
+            if (!routeField || !currencyPreview) {
+                return;
+            }
+
+            if (routeField.value === "china_russia") {
+                currencyPreview.textContent =
+                    "RUB — Российский рубль";
+                return;
+            }
+
+            if (
+                routeField.value === "china_belarus"
+                || routeField.value === "china_russia_belarus"
+            ) {
+                currencyPreview.textContent =
+                    "BYN — Белорусский рубль";
+                return;
+            }
+
+            currencyPreview.textContent =
+                "Выберите маршрут";
+        }
+
+        routeField.addEventListener(
+            "change",
+            updateFinalCurrency
+        );
+
+        updateFinalCurrency();
+    });
+</script>
 {% endblock %}

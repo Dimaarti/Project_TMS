@@ -1,37 +1,44 @@
 {% extends "base.html" %}
 
+{% block title %}
+    Курсы на {{ rate.date|date:"d.m.Y" }}
+{% endblock %}
+
 {% block content %}
 <div class="container py-4">
-
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    {# Заголовок страницы #}
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
         <div>
-            <h1 class="mb-1">
+            <h1 class="h3 mb-1">
                 Курсы на {{ rate.date|date:"d.m.Y" }}
             </h1>
 
-            <div class="text-muted">
-                ID курса: {{ rate.pk }}
-            </div>
+            {% if rate.created_at %}
+                <div class="small text-muted">
+                    Создан:
+                    {{ rate.created_at|date:"d.m.Y H:i" }}
+                </div>
+            {% endif %}
         </div>
 
-        <div class="d-flex gap-2">
+        <div class="d-flex flex-wrap gap-2">
             <a
-                href="{% url 'finance:list' %}"
-                class="btn btn-outline-secondary"
+                href="{% url 'finance:rate_list' %}"
+                class="btn btn-sm btn-outline-secondary"
             >
                 Все курсы
             </a>
 
             <form
                 method="post"
-                action="{% url 'finance:delete' rate.pk %}"
-
+                action="{% url 'finance:rate_delete' pk=rate.pk %}"
+                onsubmit="return confirm('Удалить курсы на {{ rate.date|date:'d.m.Y' }}?');"
             >
                 {% csrf_token %}
 
                 <button
                     type="submit"
-                    class="btn btn-outline-danger"
+                    class="btn btn-sm btn-outline-danger"
                 >
                     Удалить
                 </button>
@@ -39,105 +46,336 @@
         </div>
     </div>
 
-    <div class="row g-4">
-
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-1">
-                        Беларусь
-                    </h5>
-
-                    <div class="text-muted small">
-                        Итоговая валюта BYN
-                    </div>
-                </div>
-
-                <div class="card-body p-0">
-                    <table class="table mb-0 align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Валюта</th>
-                                <th>Себестоимость</th>
-                                <th>Для клиента</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            <tr>
-                                <th>CNY → BYN</th>
-                                <td>{{ rate.cny_to_byn }}</td>
-                                <td class="text-success fw-semibold">
-                                    {{ rate.cny_to_byn_client }}
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <th>USD → BYN</th>
-                                <td>{{ rate.usd_to_byn }}</td>
-                                <td class="text-success fw-semibold">
-                                    {{ rate.usd_to_byn_client }}
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <th>RUB → BYN</th>
-                                <td>{{ rate.rub_to_byn }}</td>
-                                <td class="text-success fw-semibold">
-                                    {{ rate.rub_to_byn_client }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    {# Объяснение логики маршрутов #}
+    <div class="alert alert-light border shadow-sm py-3 mb-4">
+        <div class="fw-semibold mb-1">
+            Как используются курсы
         </div>
 
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-1">
-                        Россия
-                    </h5>
+        <div class="small text-muted">
+            Стоимость товаров рассчитывается по направлениям
+            <strong class="text-body">CNY → RUB</strong>
+            или
+            <strong class="text-body">CNY → BYN</strong>.
 
-                    <div class="text-muted small">
-                        Итоговая валюта RUB
-                    </div>
-                </div>
-
-                <div class="card-body p-0">
-                    <table class="table mb-0 align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Валюта</th>
-                                <th>Себестоимость</th>
-                                <th>Для клиента</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            <tr>
-                                <th>CNY → RUB</th>
-                                <td>{{ rate.cny_to_rub }}</td>
-                                <td class="text-success fw-semibold">
-                                    {{ rate.cny_to_rub_client }}
-                                </td>
-                            </tr>
-
-                            <tr>
-                                <th>USD → RUB</th>
-                                <td>{{ rate.usd_to_rub }}</td>
-                                <td class="text-success fw-semibold">
-                                    {{ rate.usd_to_rub_client }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            Для маршрута
+            <strong class="text-body">
+                Китай → Россия → Беларусь
+            </strong>
+            логистика и дополнительные расходы конвертируются последовательно:
+            <strong class="text-body">исходная валюта → RUB → BYN</strong>.
         </div>
-
     </div>
 
+    {# Карточки курсов #}
+    <div class="row g-4">
+        {# Беларусь #}
+        <div class="col-xl-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center gap-3">
+                        <div>
+                            <h2 class="h5 mb-1">
+                                Беларусь
+                            </h2>
+
+                            <div class="small text-muted">
+                                Итоговая валюта расчёта — BYN
+                            </div>
+                        </div>
+
+                        <span class="badge text-bg-light border text-dark">
+                            BYN
+                        </span>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-3">
+                                    Направление
+                                </th>
+
+                                <th>
+                                    Себестоимость
+                                </th>
+
+                                <th class="pe-3">
+                                    Для клиента
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {# CNY → BYN #}
+                            <tr>
+                                <td class="ps-3">
+                                    <div class="fw-semibold">
+                                        CNY → BYN
+                                    </div>
+
+                                    <div class="small text-muted">
+                                        Китайский юань
+                                    </div>
+                                </td>
+
+                                <td class="text-nowrap">
+                                    <span class="small text-muted">
+                                        1 CNY =
+                                    </span>
+
+                                    <span class="fw-semibold">
+                                        {{ rate.cny_to_byn|floatformat:4 }}
+                                    </span>
+
+                                    <span class="small text-muted">
+                                        BYN
+                                    </span>
+                                </td>
+
+                                <td class="text-nowrap pe-3">
+                                    <span class="small text-muted">
+                                        1 CNY =
+                                    </span>
+
+                                    <span class="fw-semibold text-success">
+                                        {{ rate.cny_to_byn_client|floatformat:4 }}
+                                    </span>
+
+                                    <span class="small text-success">
+                                        BYN
+                                    </span>
+                                </td>
+                            </tr>
+
+                            {# USD → BYN #}
+                            <tr>
+                                <td class="ps-3">
+                                    <div class="fw-semibold">
+                                        USD → BYN
+                                    </div>
+
+                                    <div class="small text-muted">
+                                        Доллар США
+                                    </div>
+                                </td>
+
+                                <td class="text-nowrap">
+                                    <span class="small text-muted">
+                                        1 USD =
+                                    </span>
+
+                                    <span class="fw-semibold">
+                                        {{ rate.usd_to_byn|floatformat:4 }}
+                                    </span>
+
+                                    <span class="small text-muted">
+                                        BYN
+                                    </span>
+                                </td>
+
+                                <td class="text-nowrap pe-3">
+                                    <span class="small text-muted">
+                                        1 USD =
+                                    </span>
+
+                                    <span class="fw-semibold text-success">
+                                        {{ rate.usd_to_byn_client|floatformat:4 }}
+                                    </span>
+
+                                    <span class="small text-success">
+                                        BYN
+                                    </span>
+                                </td>
+                            </tr>
+
+                            {# RUB → BYN #}
+                            <tr>
+                                <td class="ps-3">
+                                    <div class="fw-semibold">
+                                        RUB → BYN
+                                    </div>
+
+                                    <div class="small text-muted">
+                                        Российский рубль
+                                    </div>
+                                </td>
+
+                                <td class="text-nowrap">
+                                    <span class="small text-muted">
+                                        1 RUB =
+                                    </span>
+
+                                    <span class="fw-semibold">
+                                        {{ rate.rub_to_byn|floatformat:4 }}
+                                    </span>
+
+                                    <span class="small text-muted">
+                                        BYN
+                                    </span>
+                                </td>
+
+                                <td class="text-nowrap pe-3">
+                                    <span class="small text-muted">
+                                        1 RUB =
+                                    </span>
+
+                                    <span class="fw-semibold text-success">
+                                        {{ rate.rub_to_byn_client|floatformat:4 }}
+                                    </span>
+
+                                    <span class="small text-success">
+                                        BYN
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {# Россия #}
+        <div class="col-xl-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center gap-3">
+                        <div>
+                            <h2 class="h5 mb-1">
+                                Россия
+                            </h2>
+
+                            <div class="small text-muted">
+                                Итоговая валюта расчёта — RUB
+                            </div>
+                        </div>
+
+                        <span class="badge text-bg-light border text-dark">
+                            RUB
+                        </span>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-3">
+                                    Направление
+                                </th>
+
+                                <th>
+                                    Себестоимость
+                                </th>
+
+                                <th class="pe-3">
+                                    Для клиента
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {# CNY → RUB #}
+                            <tr>
+                                <td class="ps-3">
+                                    <div class="fw-semibold">
+                                        CNY → RUB
+                                    </div>
+
+                                    <div class="small text-muted">
+                                        Китайский юань
+                                    </div>
+                                </td>
+
+                                <td class="text-nowrap">
+                                    <span class="small text-muted">
+                                        1 CNY =
+                                    </span>
+
+                                    <span class="fw-semibold">
+                                        {{ rate.cny_to_rub|floatformat:4 }}
+                                    </span>
+
+                                    <span class="small text-muted">
+                                        RUB
+                                    </span>
+                                </td>
+
+                                <td class="text-nowrap pe-3">
+                                    <span class="small text-muted">
+                                        1 CNY =
+                                    </span>
+
+                                    <span class="fw-semibold text-success">
+                                        {{ rate.cny_to_rub_client|floatformat:4 }}
+                                    </span>
+
+                                    <span class="small text-success">
+                                        RUB
+                                    </span>
+                                </td>
+                            </tr>
+
+                            {# USD → RUB #}
+                            <tr>
+                                <td class="ps-3">
+                                    <div class="fw-semibold">
+                                        USD → RUB
+                                    </div>
+
+                                    <div class="small text-muted">
+                                        Доллар США
+                                    </div>
+                                </td>
+
+                                <td class="text-nowrap">
+                                    <span class="small text-muted">
+                                        1 USD =
+                                    </span>
+
+                                    <span class="fw-semibold">
+                                        {{ rate.usd_to_rub|floatformat:4 }}
+                                    </span>
+
+                                    <span class="small text-muted">
+                                        RUB
+                                    </span>
+                                </td>
+
+                                <td class="text-nowrap pe-3">
+                                    <span class="small text-muted">
+                                        1 USD =
+                                    </span>
+
+                                    <span class="fw-semibold text-success">
+                                        {{ rate.usd_to_rub_client|floatformat:4 }}
+                                    </span>
+
+                                    <span class="small text-success">
+                                        RUB
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Объяснение колонок #}
+    <div class="small text-muted mt-3">
+        <span class="fw-semibold text-body">
+            Себестоимость
+        </span>
+        — внутренний курс для расчёта затрат.
+
+        <span class="fw-semibold text-success ms-1">
+            Для клиента
+        </span>
+        — курс, используемый при расчёте итоговой стоимости клиента.
+    </div>
 </div>
 {% endblock %}

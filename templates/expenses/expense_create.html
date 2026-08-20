@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="mx-auto" style="max-width: 760px;">
+    <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+        <div>
+            <h1 class="h3 mb-1">{{ title }}</h1>
+
+            <div class="text-muted">
+                Поставка №{{ shipment.number }}
+            </div>
+        </div>
+
+        <a
+            href="{{ cancel_url }}"
+            class="btn btn-sm btn-outline-secondary"
+        >
+            Отмена
+        </a>
+    </div>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger py-2">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h2 class="h6 mb-3">
+                    Назначение расхода
+                </h2>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        {{ form.expense_type|as_crispy_field }}
+                    </div>
+
+                    <div class="col-md-6">
+                        {{ form.item|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="small text-muted mt-2">
+                    Если расход относится к определённому товару,
+                    выберите его. Оставьте поле пустым, если расход
+                    необходимо распределить между всеми товарами поставки.
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h2 class="h6 mb-3">
+                    Сумма расхода
+                </h2>
+
+                <div class="row g-3">
+                    <div class="col-md-7">
+                        {{ form.amount|as_crispy_field }}
+                    </div>
+
+                    <div class="col-md-5">
+                        {{ form.currency|as_crispy_field }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+            <a
+                href="{{ cancel_url }}"
+                class="btn btn-outline-secondary"
+            >
+                Отмена
+            </a>
+
+            <button
+                type="submit"
+                class="btn btn-primary px-4"
+            >
+                {% if object %}
+                    Сохранить изменения
+                {% else %}
+                    Добавить расход
+                {% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

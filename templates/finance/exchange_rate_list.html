@@ -1,19 +1,25 @@
 {% extends "base.html" %}
 
+{% block title %}
+    Курсы валют
+{% endblock %}
+
 {% block content %}
 <div class="container py-4">
-
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    {# Заголовок страницы #}
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
         <div>
-            <h1 class="mb-1">
+            <h1 class="h3 mb-1">
                 Курсы валют
             </h1>
 
-
+            <div class="text-muted">
+                Курсы для расчёта себестоимости и стоимости для клиентов
+            </div>
         </div>
 
         <a
-            href="{% url 'finance:create' %}"
+            href="{% url 'finance:rate_create' %}"
             class="btn btn-primary"
         >
             Добавить курсы
@@ -21,21 +27,49 @@
     </div>
 
     {% if exchange_rate %}
-        <div class="card border-0 shadow-sm">
-            <div class="table-responsive">
+        {# Заголовок списка #}
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+                <h2 class="h5 mb-1">
+                    История курсов
+                </h2>
 
+                <div class="small text-muted">
+                    Новые записи отображаются первыми
+                </div>
+            </div>
+
+            <span class="badge text-bg-light border text-dark">
+                {{ exchange_rate|length }}
+            </span>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th class="ps-4">
-                                ID
-                            </th>
-
-                            <th>
+                            <th class="ps-3">
                                 Дата
                             </th>
 
-                            <th class="text-end pe-4">
+                            <th>
+                                CNY → BYN
+                            </th>
+
+                            <th>
+                                CNY → RUB
+                            </th>
+
+                            <th>
+                                RUB → BYN
+                            </th>
+
+                            <th class="text-center">
+                                Поставки
+                            </th>
+
+                            <th class="text-end pe-3">
                                 Действия
                             </th>
                         </tr>
@@ -44,53 +78,190 @@
                     <tbody>
                         {% for rate in exchange_rate %}
                             <tr>
-                                <td class="ps-4">
-                                    #{{ rate.pk }}
+                                {# Дата #}
+                                <td class="ps-3">
+                                    <a
+                                        href="{% url 'finance:rate_detail' pk=rate.pk %}"
+                                        class="text-decoration-none text-body fw-semibold"
+                                    >
+                                        {{ rate.date|date:"d.m.Y" }}
+                                    </a>
+
+                                    {% if forloop.first %}
+                                        <span class="badge text-bg-success ms-1">
+                                            Последний
+                                        </span>
+                                    {% endif %}
+
+                                    {% if rate.created_at %}
+                                        <div class="small text-muted mt-1">
+                                            Добавлен:
+                                            {{ rate.created_at|date:"d.m.Y H:i" }}
+                                        </div>
+                                    {% endif %}
                                 </td>
 
-                                <td>
-                                    {{ rate.date|date:"d.m.Y" }}
+                                {# CNY → BYN #}
+                                <td class="text-nowrap">
+                                    <div>
+                                        <span class="small text-muted">
+                                            Себ.:
+                                        </span>
+
+                                        <span class="fw-semibold">
+                                            {{ rate.cny_to_byn|floatformat:4 }}
+                                        </span>
+                                    </div>
+
+                                    <div>
+                                        <span class="small text-muted">
+                                            Клиент:
+                                        </span>
+
+                                        <span class="fw-semibold text-success">
+                                            {{ rate.cny_to_byn_client|floatformat:4 }}
+                                        </span>
+                                    </div>
                                 </td>
 
-                                <td class="text-end pe-4">
-                                    <div class="d-inline-flex gap-2">
+                                {# CNY → RUB #}
+                                <td class="text-nowrap">
+                                    <div>
+                                        <span class="small text-muted">
+                                            Себ.:
+                                        </span>
 
+                                        <span class="fw-semibold">
+                                            {{ rate.cny_to_rub|floatformat:4 }}
+                                        </span>
+                                    </div>
+
+                                    <div>
+                                        <span class="small text-muted">
+                                            Клиент:
+                                        </span>
+
+                                        <span class="fw-semibold text-success">
+                                            {{ rate.cny_to_rub_client|floatformat:4 }}
+                                        </span>
+                                    </div>
+                                </td>
+
+                                {# RUB → BYN #}
+                                <td class="text-nowrap">
+                                    <div>
+                                        <span class="small text-muted">
+                                            Себ.:
+                                        </span>
+
+                                        <span class="fw-semibold">
+                                            {{ rate.rub_to_byn|floatformat:4 }}
+                                        </span>
+                                    </div>
+
+                                    <div>
+                                        <span class="small text-muted">
+                                            Клиент:
+                                        </span>
+
+                                        <span class="fw-semibold text-success">
+                                            {{ rate.rub_to_byn_client|floatformat:4 }}
+                                        </span>
+                                    </div>
+                                </td>
+
+                                {# Количество поставок #}
+                                <td class="text-center">
+                                    {% if rate.shipment_count %}
+                                        <span
+                                            class="badge text-bg-light border text-dark"
+                                            title="Курс используется в поставках"
+                                        >
+                                            {{ rate.shipment_count }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">
+                                            0
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                {# Действия #}
+                                <td class="text-end pe-3">
+                                    <div class="d-inline-flex flex-wrap justify-content-end gap-2">
                                         <a
-                                            href="{% url 'finance:detail' pk=rate.pk %}"
+                                            href="{% url 'finance:rate_detail' pk=rate.pk %}"
                                             class="btn btn-sm btn-outline-primary"
                                         >
                                             Подробнее
                                         </a>
 
-                                        <form
-                                            method="post"
-                                            action="{% url 'finance:delete' pk=rate.pk %}"
-
-                                        >
-                                            {% csrf_token %}
-
-                                            <button
-                                                type="submit"
-                                                class="btn btn-sm btn-outline-danger"
+                                        {% if rate.shipment_count == 0 %}
+                                            <form
+                                                method="post"
+                                                action="{% url 'finance:rate_delete' pk=rate.pk %}"
+                                                onsubmit="return confirm('Удалить курсы на {{ rate.date|date:'d.m.Y' }}?');"
                                             >
-                                                Удалить
-                                            </button>
-                                        </form>
+                                                {% csrf_token %}
 
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                >
+                                                    Удалить
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-outline-secondary"
+                                                disabled
+                                                title="Курс нельзя удалить: он используется в поставках"
+                                            >
+                                                Используется
+                                            </button>
+                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-
             </div>
         </div>
+
+        {# Объяснение значений #}
+        <div class="small text-muted mt-3">
+            <span class="fw-semibold text-body">
+                Себ.
+            </span>
+            — внутренний курс себестоимости.
+
+            <span class="fw-semibold text-success ms-1">
+                Клиент
+            </span>
+            — курс для расчёта стоимости клиента.
+        </div>
     {% else %}
-        <div class="alert alert-info">
-            Курсы валют пока не добавлены.
+        {# Пустой список #}
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-5">
+                <h2 class="h5 mb-2">
+                    Курсы валют пока не добавлены
+                </h2>
+
+                <p class="text-muted mb-3">
+                    Добавьте курсы перед созданием и расчётом поставки.
+                </p>
+
+                <a
+                    href="{% url 'finance:rate_create' %}"
+                    class="btn btn-primary"
+                >
+                    Добавить первые курсы
+                </a>
+            </div>
         </div>
     {% endif %}
-
 </div>
 {% endblock %}

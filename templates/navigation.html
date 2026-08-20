@@ -1,97 +1,140 @@
-<nav
-        class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm"
->
+{% with namespace=request.resolver_match.namespace url_name=request.resolver_match.url_name %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
     <div class="container">
 
+        {# Бренд #}
         <a
-                class="navbar-brand fw-semibold"
-                href="{% url 'shipment:list' %}"
+            href="{% url 'shipment:list' %}"
+            class="navbar-brand d-flex align-items-center gap-2 me-lg-4"
         >
-            Доставка из Китая
+            <span
+                class="d-inline-flex align-items-center justify-content-center
+                       border border-secondary rounded-2 fw-bold"
+                style="width: 32px; height: 32px; font-size: 12px;"
+            >
+                快递
+            </span>
+
+
+
+                <span class="fw-semibold">
+                    China Calc
+                </span>
         </a>
 
-        <div
-                class="collapse navbar-collapse"
-                id="mainNavbar"
+        {# Кнопка мобильного меню #}
+        <button
+            class="navbar-toggler border-0 shadow-none"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#mainNavbar"
+            aria-controls="mainNavbar"
+            aria-expanded="false"
+            aria-label="Открыть меню"
         >
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
+        <div
+            class="collapse navbar-collapse"
+            id="mainNavbar"
+        >
             {% if user.is_authenticated %}
 
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
-                <li class="nav-item">
-                    <a
-                            class="nav-link
-                            {% if request.resolver_match.url_name == 'list' and request.resolver_match.namespace == 'shipment' %}
-                                active
-                            {% endif %}"
+                {# Основная навигация #}
+                <ul class="navbar-nav me-auto gap-lg-1 py-3 py-lg-0">
+                    <li class="nav-item">
+                        <a
                             href="{% url 'shipment:list' %}"
-                    >
-                        Поставки
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a
-                            class="nav-link
-                            {% if request.resolver_match.namespace == 'client' %}
-                                active
+                            class="nav-link px-lg-3 rounded-2
+                            {% if namespace == 'shipment' %}
+                                active bg-white bg-opacity-10
                             {% endif %}"
+                        >
+                            Поставки
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
+                            href="{% url 'finance:calculations_list' %}"
+                            class="nav-link px-lg-3 rounded-2
+                            {% if namespace == 'finance' and 'calculations' in url_name %}
+                                active bg-white bg-opacity-10
+                            {% endif %}"
+                        >
+                            Расчёты
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a
                             href="{% url 'client:list' %}"
-                    >
-                        Клиенты
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a
-                            class="nav-link
-                            {% if request.resolver_match.namespace == 'list' %}
-                                active
+                            class="nav-link px-lg-3 rounded-2
+                            {% if namespace == 'client' %}
+                                active bg-white bg-opacity-10
                             {% endif %}"
-                            href="{% url 'finance:list' %}"
-                    >
-                        Курсы валют
-                    </a>
-                </li>
+                        >
+                            Клиенты
+                        </a>
+                    </li>
 
-            </ul>
+                    <li class="nav-item">
+                        <a
+                            href="{% url 'finance:rate_list' %}"
+                            class="nav-link px-lg-3 rounded-2
+                            {% if namespace == 'finance' and 'rate' in url_name %}
+                                active bg-white bg-opacity-10
+                            {% endif %}"
+                        >
+                            Курсы валют
+                        </a>
+                    </li>
+                </ul>
 
-            <div class="d-flex flex-column flex-lg-row align-items-lg-center gap-3">
-
-                    <span class="navbar-text text-light">
+                {# Пользователь #}
+                <div
+                    class="d-flex flex-column flex-lg-row
+                           align-items-lg-center gap-2 gap-lg-3
+                           border-top border-secondary
+                           border-lg-0 pt-3 pt-lg-0"
+                >
+                    <div class="small text-white-50">
                         {{ user.email }}
-                    </span>
+                    </div>
 
-                <form
+                    <form
                         method="post"
                         action="{% url 'account:logout' %}"
                         class="mb-0"
-                >
-                    {% csrf_token %}
-
-                    <button
-                            type="submit"
-                            class="btn btn-sm btn-outline-danger"
                     >
-                        Выйти
-                    </button>
-                </form>
+                        {% csrf_token %}
 
-            </div>
+                        <button
+                            type="submit"
+                            class="btn btn-sm btn-outline-light"
+                        >
+                            Выйти
+                        </button>
+                    </form>
+                </div>
 
             {% else %}
 
-            <div class="ms-lg-auto mt-3 mt-lg-0">
-                <a
-                        href="{% url 'account:login' %}"
-                        class="btn btn-outline-light"
-                >
-                    Войти
-                </a>
-            </div>
+                {# Неавторизованный пользователь #}
+                {% if url_name != "login" %}
+                    <div class="ms-lg-auto py-3 py-lg-0">
+                        <a
+                            href="{% url 'account:login' %}"
+                            class="btn btn-sm btn-outline-light"
+                        >
+                            Войти
+                        </a>
+                    </div>
+                {% endif %}
 
             {% endif %}
         </div>
     </div>
 </nav>
+{% endwith %}
