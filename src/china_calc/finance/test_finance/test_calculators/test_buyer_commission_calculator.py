@@ -10,16 +10,16 @@ class TestBuyerCommissionCalculator(TestCase):
     # проверка расчета комиссии
     def test_calculate_commission(self):
         result = BuyerCommissionCalculator.calculate_amount(
-            client_purchase_cost=Decimal(100),
-            commission_percent=Decimal(10),
+            client_purchase_cost=Decimal("100"),
+            commission_percent=Decimal("10"),
         )
 
-        self.assertEqual(result, Decimal(10))
+        self.assertEqual(result, Decimal("10"))
 
     # проверка дробного процента
     def test_float_commission(self):
         result = BuyerCommissionCalculator.calculate_amount(
-            client_purchase_cost=Decimal(100),
+            client_purchase_cost=Decimal("100"),
             commission_percent=Decimal("5.5"),
         )
 
@@ -28,11 +28,11 @@ class TestBuyerCommissionCalculator(TestCase):
     # проверка нулевой комиссии
     def test_zero_commission(self):
         result = BuyerCommissionCalculator.calculate_amount(
-            client_purchase_cost=Decimal(100),
-            commission_percent=Decimal(0),
+            client_purchase_cost=Decimal("100"),
+            commission_percent=Decimal("0"),
         )
 
-        self.assertEqual(result, Decimal(0))
+        self.assertEqual(result, Decimal("0"))
 
     # проверка отрицательной стоимости клиента
     def test_rejects_negative_client_price_cost(self):
@@ -41,8 +41,8 @@ class TestBuyerCommissionCalculator(TestCase):
             "Стоимость товаров клиента не может быть отрицательной",
         ):
             BuyerCommissionCalculator.calculate_amount(
-                client_purchase_cost=Decimal(-100),
-                commission_percent=Decimal(5),
+                client_purchase_cost=Decimal("-100"),
+                commission_percent=Decimal("5"),
             )
 
     # проверка отрицательного процента
@@ -51,8 +51,8 @@ class TestBuyerCommissionCalculator(TestCase):
             ValueError, "Процент комиссии не может быть отрицательным"
         ):
             BuyerCommissionCalculator.calculate_amount(
-                client_purchase_cost=Decimal(100),
-                commission_percent=Decimal(-5),
+                client_purchase_cost=Decimal("100"),
+                commission_percent=Decimal("-5"),
             )
 
     # проверка, процент больше 100
@@ -61,6 +61,6 @@ class TestBuyerCommissionCalculator(TestCase):
             ValueError, "Процент комиссии не может быть больше 100"
         ):
             BuyerCommissionCalculator.calculate_amount(
-                client_purchase_cost=Decimal(100),
-                commission_percent=Decimal(102),
+                client_purchase_cost=Decimal("100"),
+                commission_percent=Decimal("102"),
             )

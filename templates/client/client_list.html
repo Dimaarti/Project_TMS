@@ -219,7 +219,7 @@
                                         <div class="d-flex flex-wrap justify-content-xl-end gap-2">
                                             {% if payment_result.debt_amount > 0 %}
                                                 <a
-                                                    href="{% url 'finance:client_payment_create' shipment_pk=payment_result.calculation_result.shipment_id client_pk=client_object.pk %}"
+                                                    href="{% url 'finance:client_payment_create' shipment_pk=payment_result.calculation_result.shipment_id client_pk=payment_result.client_id %}"
                                                     class="btn btn-sm btn-primary"
                                                 >
                                                     Добавить оплату

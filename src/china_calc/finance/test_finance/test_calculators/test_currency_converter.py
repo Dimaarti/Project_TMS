@@ -70,7 +70,7 @@ class TestCurrencyConverter(TestCase):
     def test_rejects_negative_amount(self):
         with self.assertRaisesRegex(ValueError, "Сумма не может быть отрицательной"):
             CurrencyCalculator.convert_currency(
-                amount=Decimal(-1),
+                amount=Decimal("-1"),
                 purchase_currency=Currency.CNY,
                 final_currency=Currency.BYN,
                 exchange_rate=self.exchange_rate,
@@ -82,7 +82,7 @@ class TestCurrencyConverter(TestCase):
             ValueError,
         ):
             CurrencyCalculator.convert_currency(
-                amount=Decimal(100),
+                amount=Decimal("100"),
                 purchase_currency=Currency.BYN,
                 final_currency=Currency.CNY,
                 exchange_rate=self.exchange_rate,
@@ -93,10 +93,10 @@ class TestCurrencyConverter(TestCase):
         exchange_rate = SimpleNamespace()
 
         with self.assertRaisesRegex(
-            ValueError, "В модели обменного курса отсутствует поле - cny_to_byn"
+            ValueError, "В модели обменного курса отсутствует поле cny_to_byn"
         ):
             CurrencyCalculator.convert_currency(
-                amount=Decimal(100),
+                amount=Decimal("100"),
                 purchase_currency=Currency.CNY,
                 final_currency=Currency.BYN,
                 exchange_rate=exchange_rate,

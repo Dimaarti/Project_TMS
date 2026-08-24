@@ -5,7 +5,7 @@ from china_calc.finance.calculators.currency_calculator import CurrencyCalculato
 from china_calc.finance.calculators.proportional_allocation_calculator import (
     ProportionalAllocationCalculator,
 )
-from config.model_choices import Currency, LogisticCalculationMethod
+from config.model_choices import Currency, LogisticCalculationMethod, DeliveryRouteType
 
 
 class ShipmentExpenseCalculator:
@@ -24,28 +24,32 @@ class ShipmentExpenseCalculator:
         else:
             expenses = list(expenses)
 
-        direct_expenses_item = {item.pk: Decimal(0) for item in items}
+        direct_expenses_item = {item.pk: Decimal("0") for item in items}
 
-        common_expenses_cost = Decimal(0)
+        common_expenses_cost = Decimal("0")
 
-        total_expenses_cost_rub = Decimal(0)
+        total_expenses_cost_rub = Decimal("0")
 
         for expense in expenses:
+            if expense.item_id is not None:
+                cls.validate_direct_expense(
+                    expense=expense,
+                    shipment=shipment,
+                    direct_expenses_item=direct_expenses_item,
+                )
+
             expense_cost = cls.convert_expense(
                 expense=expense,
                 shipment=shipment,
             )
 
-            expense_cost_rub = cls.convert_expense_to_rub(
-                shipment=shipment, expense=expense
-            )
-            total_expenses_cost_rub += expense_cost_rub
+            if shipment.route_type == DeliveryRouteType.CHINA_RUSSIA_BELARUS:
+                expense_cost_rub = cls.convert_expense_to_rub(
+                    shipment=shipment, expense=expense
+                )
+                total_expenses_cost_rub += expense_cost_rub
 
             if expense.item_id is not None:
-                cls.validate_direct_expense(
-                    expense=expense,
-                    direct_expenses_item=direct_expenses_item,
-                )
                 direct_expenses_item[expense.item_id] += expense_cost
             else:
                 common_expenses_cost += expense_cost
@@ -67,7 +71,7 @@ class ShipmentExpenseCalculator:
             item_allocations=item_allocations,
         )
 
-        direct_expenses_cost = sum(direct_expenses_item.values(), Decimal(0))
+        direct_expenses_cost = sum(direct_expenses_item.values(), Decimal("0"))
 
         total_expenses_cost = direct_expenses_cost + common_expenses_cost
 
@@ -86,7 +90,7 @@ class ShipmentExpenseCalculator:
         Переводит расход в итоговую валюту поставки.
         """
 
-        if expense.amount < Decimal(0):
+        if expense.amount < Decimal("0"):
             raise ValueError("Сумма расхода не может быть отрицательной")
 
         return CurrencyCalculator.convert_for_route(
@@ -104,7 +108,7 @@ class ShipmentExpenseCalculator:
         Клиентский курс не используется.
         """
 
-        if expense.amount < 0:
+        if expense.amount < Decimal("0"):
             raise ValueError("Сумма расхода не может быть отрицательной")
 
         return CurrencyCalculator.convert_currency(
@@ -116,7 +120,7 @@ class ShipmentExpenseCalculator:
         )
 
     @staticmethod
-    def validate_direct_expense(expense, direct_expenses_item):
+    def validate_direct_expense(expense, shipment, direct_expenses_item):
         """
         Проверяет отношение прямого расхода к товару текущей поставки.
         """
@@ -130,17 +134,17 @@ class ShipmentExpenseCalculator:
         Распределяет общие расходы между товарами (weight or volume)
         """
 
-        if common_expenses_cost == Decimal(0):
-            return {item.pk: Decimal(0) for item in items}
+        if common_expenses_cost == Decimal("0"):
+            return {item.pk: Decimal("0") for item in items}
 
         basis_item = cls.get_basis_item(
             shipment=shipment,
             items=items,
         )
 
-        total_basis = sum(basis_item.values(), Decimal(0))
+        total_basis = sum(basis_item.values(), Decimal("0"))
 
-        if total_basis <= Decimal(0):
+        if total_basis <= Decimal("0"):
             raise ValueError(
                 "Невозможно распределить общие расходы, вес или объем товаров равен или меньше 0"
             )
@@ -174,7 +178,7 @@ class ShipmentExpenseCalculator:
             if basis is None:
                 raise ValueError("У товара не указан вес или объем")
 
-            if basis < 0:
+            if basis < Decimal("0"):
                 raise ValueError("Вес или объем товара не может быть отрицательным")
 
         return basis_item
@@ -187,8 +191,8 @@ class ShipmentExpenseCalculator:
         result = {}
 
         for item in items:
-            direct_cost = direct_expenses_item.get(item.pk, Decimal(0))
-            distributed_cost = distributed_expenses_item.get(item.pk, Decimal(0))
+            direct_cost = direct_expenses_item.get(item.pk, Decimal("0"))
+            distributed_cost = distributed_expenses_item.get(item.pk, Decimal("0"))
 
             result[item.pk] = {
                 "item_id": item.pk,
@@ -207,11 +211,11 @@ class ShipmentExpenseCalculator:
         """
 
         direct_expenses_client = defaultdict(
-            lambda: Decimal(0),
+            lambda: Decimal("0"),
         )
 
         distributed_expenses_client = defaultdict(
-            lambda: Decimal(0),
+            lambda: Decimal("0"),
         )
 
         for item in items:

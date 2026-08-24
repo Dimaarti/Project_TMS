@@ -11,9 +11,9 @@ class PurchaseCalculator:
         for_client = True - стоимость по клиентскому курсу.
         for_client = False - по курсу себестоимости.
         """
-        if item.price < Decimal(0):
+        if item.price < Decimal("0"):
             raise ValueError("Цена товара не может быть отрицательной")
-        if item.quantity <= Decimal(0):
+        if item.quantity <= Decimal("0"):
             raise ValueError("Количество товара должно быть больше 0")
 
         amount = item.price * item.quantity
@@ -21,7 +21,7 @@ class PurchaseCalculator:
         return CurrencyCalculator.convert_goods(
             amount=amount,
             purchase_currency=item.price_currency,
-            final_currency=shipment.route_final_currency,
+            final_currency=shipment.settlement_final_currency,
             exchange_rate=shipment.exchange_rate,
             for_client=for_client,
         )

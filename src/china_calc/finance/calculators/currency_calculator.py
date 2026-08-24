@@ -122,7 +122,7 @@ class CurrencyCalculator:
         CNY -> BYN
         """
 
-        if amount < Decimal(0):
+        if amount < Decimal("0"):
             raise ValueError("Стоимость товара не может быть отрицательной")
 
         if purchase_currency == final_currency:

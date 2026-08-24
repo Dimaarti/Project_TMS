@@ -14,7 +14,7 @@ class TestShipmentCargoCalculator(TestCase):
         shipment = MagicMock()
 
         shipment.items.aggregate.return_value = {
-            "total_weight": Decimal(10),
+            "total_weight": Decimal("10"),
             "total_volume": Decimal("2.5"),
         }
 
@@ -22,7 +22,7 @@ class TestShipmentCargoCalculator(TestCase):
 
         result = calculator.calculate()
 
-        self.assertEqual(result["weight"], Decimal(10))
+        self.assertEqual(result["weight"], Decimal("10"))
         self.assertEqual(result["volume"], Decimal("2.5"))
 
     # проверка правильного объекта поставки
@@ -36,7 +36,7 @@ class TestShipmentCargoCalculator(TestCase):
         shipment.pk = 19
 
         shipment.items.aggregate.return_value = {
-            "total_weight": Decimal(10),
+            "total_weight": Decimal("10"),
             "total_volume": Decimal("2.5"),
         }
         calculator = ShipmentCargoCalculator(shipment=shipment)
@@ -48,22 +48,22 @@ class TestShipmentCargoCalculator(TestCase):
             weight=Decimal(10), volume=Decimal("2.5")
         )
 
-        self.assertEqual(shipment.weight, Decimal(10))
+        self.assertEqual(shipment.weight, Decimal("10"))
         self.assertEqual(shipment.volume, Decimal("2.5"))
-        self.assertEqual(result, {"weight": Decimal(10), "volume": Decimal("2.5")})
+        self.assertEqual(result, {"weight": Decimal("10"), "volume": Decimal("2.5")})
 
     # проверка поставки без товаров
     def test_returns_zero_when_shipment_has_no_items(self):
         shipment = MagicMock()
 
         shipment.items.aggregate.return_value = {
-            "total_weight": Decimal(0),
-            "total_volume": Decimal(0),
+            "total_weight": Decimal("0"),
+            "total_volume": Decimal("0"),
         }
 
         calculator = ShipmentCargoCalculator(shipment=shipment)
 
         result = calculator.calculate()
 
-        self.assertEqual(result["weight"], Decimal(0))
-        self.assertEqual(result["volume"], Decimal(0))
+        self.assertEqual(result["weight"], Decimal("0"))
+        self.assertEqual(result["volume"], Decimal("0"))

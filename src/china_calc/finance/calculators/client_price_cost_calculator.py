@@ -17,7 +17,7 @@ class ClientPriceCostCalculator:
             buyer_commission_cost,
         ]
 
-        if any(component < Decimal(0) for component in components):
+        if any(component < Decimal("0") for component in components):
             raise ValueError(
                 "Составляющие клиентской стоимости не могут быть отрицательными"
             )

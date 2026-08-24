@@ -15,8 +15,8 @@ class ShipmentCargoCalculator:
         """
 
         totals = self.shipment.items.aggregate(
-            total_weight=Sum("weight", default=Decimal(0)),
-            total_volume=Sum("volume", default=Decimal(0)),
+            total_weight=Sum("weight", default=Decimal("0")),
+            total_volume=Sum("volume", default=Decimal("0")),
         )
 
         return {

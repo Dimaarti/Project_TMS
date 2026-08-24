@@ -7,7 +7,7 @@ from django.test import TestCase
 from china_calc.finance.calculators.shipment_expense_calculator import (
     ShipmentExpenseCalculator,
 )
-from config.model_choices import Currency, LogisticCalculationMethod
+from config.model_choices import Currency, LogisticCalculationMethod, DeliveryRouteType
 
 
 class TestShipmentExpenseCalculator(TestCase):
@@ -38,6 +38,7 @@ class TestShipmentExpenseCalculator(TestCase):
         shipment.pk = 10
         shipment.logistic_calculation_type = LogisticCalculationMethod.WEIGHT
         shipment.settlement_final_currency = Currency.BYN
+        shipment.route_type = DeliveryRouteType.CHINA_BELARUS
         shipment.exchange_rate = SimpleNamespace()
         shipment.items.select_related.return_value.order_by.return_value = self.items
         shipment.expenses.select_related.return_value.order_by.return_value = expenses
