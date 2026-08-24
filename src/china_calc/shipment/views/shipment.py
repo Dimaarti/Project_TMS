@@ -114,9 +114,7 @@ class ShipmentUpdateView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = "Редактирование поставки"
-        context["cancel_url"] = reverse(
-            "shipment:detail", kwargs={"pk": self.object.pk}
-        )
+        context["cancel_url"] = reverse("shipment:detail", kwargs={"pk": self.object.pk})
         return context
 
     def get_success_url(self):
@@ -146,9 +144,7 @@ class ShipmentDeleteView(LoginRequiredMixin, DeleteView):
         context = super().get_context_data(**kwargs)
         context["title"] = "Удаление поставки"
         context["delete_mode"] = True
-        context["cancel_url"] = reverse(
-            "shipment:detail", kwargs={"pk": self.object.pk}
-        )
+        context["cancel_url"] = reverse("shipment:detail", kwargs={"pk": self.object.pk})
         return context
 
     def get_success_url(self):

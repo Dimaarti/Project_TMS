@@ -7,7 +7,7 @@ from django.test import TestCase
 from china_calc.finance.calculators.shipment_expense_calculator import (
     ShipmentExpenseCalculator,
 )
-from config.model_choices import Currency, LogisticCalculationMethod, DeliveryRouteType
+from config.model_choices import Currency, DeliveryRouteType, LogisticCalculationMethod
 
 
 class TestShipmentExpenseCalculator(TestCase):

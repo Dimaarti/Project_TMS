@@ -11,8 +11,8 @@ class ClientBalanceService:
         return {
             "total_amount": total_amount,
             "paid_amount": paid_amount,
-            "debt_amount": max(raw_balance, Decimal("0")),
-            "overpayment_amount": abs(min(raw_balance, Decimal("0"))),
+            "debt_amount": max(raw_balance, Decimal(0)),
+            "overpayment_amount": abs(min(raw_balance, Decimal(0))),
         }
 
     @classmethod
@@ -20,7 +20,7 @@ class ClientBalanceService:
         paid_amount = shipment.client_payments.filter(
             client=client_result.client,
             currency=client_result.calculation_result.final_currency,
-        ).aggregate(total=Sum("amount"))["total"] or Decimal("0")
+        ).aggregate(total=Sum("amount"))["total"] or Decimal(0)
 
         return cls.build(
             total_amount=client_result.client_price_cost,

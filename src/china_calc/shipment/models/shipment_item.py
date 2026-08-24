@@ -26,9 +26,7 @@ class ShipmentItem(BaseModel):
         max_length=130, null=True, blank=True, verbose_name="Трек-номер"
     )
 
-    product_link = models.URLField(
-        null=True, blank=True, verbose_name="Ссылка на товар"
-    )
+    product_link = models.URLField(null=True, blank=True, verbose_name="Ссылка на товар")
 
     quantity = models.PositiveIntegerField(default=1, verbose_name="Количество, шт")
 

@@ -73,9 +73,9 @@ class LogisticAllocationCalculator:
             items=items,
         )
 
-        total_basis = sum(basis_item.values(), Decimal("0"))
+        total_basis = sum(basis_item.values(), Decimal(0))
 
-        if total_basis <= Decimal("0"):
+        if total_basis <= Decimal(0):
             raise ValueError("Невозможно распределить логистику")
 
         amount_item = ProportionalAllocationCalculator.allocate(
@@ -117,7 +117,7 @@ class LogisticAllocationCalculator:
             raise ValueError("Неизвестный способ распределения")
 
         for item in items:
-            if basis_item[item.pk] < Decimal("0"):
+            if basis_item[item.pk] < Decimal(0):
                 raise ValueError("Вес или объем товара не может быть отрицательным")
 
         return basis_item
@@ -129,7 +129,7 @@ class LogisticAllocationCalculator:
         for item in items:
             basis = basis_item[item.pk]
             ratio = basis / total_basis
-            percent = ratio * Decimal("100")
+            percent = ratio * Decimal(100)
 
             result[item.pk] = ItemLogisticAllocation(
                 item_id=item.pk,
@@ -144,8 +144,8 @@ class LogisticAllocationCalculator:
 
     @staticmethod
     def build_client_allocations(items, item_allocations, total_basis):
-        basis_client = defaultdict(lambda: Decimal("0"))
-        amount_client = defaultdict(lambda: Decimal("0"))
+        basis_client = defaultdict(lambda: Decimal(0))
+        amount_client = defaultdict(lambda: Decimal(0))
 
         for item in items:
             item_allocation = item_allocations[item.pk]
@@ -156,7 +156,7 @@ class LogisticAllocationCalculator:
 
         for client_id, basis in basis_client.items():
             ratio = basis / total_basis
-            percent = ratio * Decimal("100")
+            percent = ratio * Decimal(100)
 
             result[client_id] = ClientLogisticAllocation(
                 client_id=client_id,

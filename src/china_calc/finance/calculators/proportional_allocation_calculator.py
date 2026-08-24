@@ -16,14 +16,14 @@ class ProportionalAllocationCalculator:
         if not items:
             return {}
 
-        if total_amount < Decimal("0"):
+        if total_amount < Decimal(0):
             raise ValueError("Распределяемая сумма не может быть отрицательной")
 
-        if total_basis <= Decimal("0"):
+        if total_basis <= Decimal(0):
             raise ValueError("Общая база распределения должна быть больше 0")
 
         allocations = {}
-        allocated_amount = Decimal("0")
+        allocated_amount = Decimal(0)
 
         for item in items[:-1]:
             basis = basis_item[item.pk]
@@ -32,9 +32,7 @@ class ProportionalAllocationCalculator:
                 raise ValueError("Для товара не указана база распределения")
 
             if basis < 0:
-                raise ValueError(
-                    "База распределения товаров не может быть отрицательной"
-                )
+                raise ValueError("База распределения товаров не может быть отрицательной")
 
             amount = total_amount * basis / total_basis
 
@@ -47,7 +45,7 @@ class ProportionalAllocationCalculator:
         if last_basis is None:
             raise ValueError("Для товара не указана база распределения")
 
-        if last_basis < Decimal("0"):
+        if last_basis < Decimal(0):
             raise ValueError("База распределения не может быть отрицательной")
 
         allocations[last_item.pk] = total_amount - allocated_amount

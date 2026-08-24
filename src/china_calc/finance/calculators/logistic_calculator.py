@@ -14,19 +14,19 @@ class LogisticCalculator:
         calculation_type = shipment.logistic_calculation_type
 
         if calculation_type == LogisticCalculationMethod.WEIGHT:
-            if shipment.weight <= Decimal("0"):
+            if shipment.weight <= Decimal(0):
                 raise ValueError("Вес поставки должен быть больше 0")
 
-            if shipment.tariff_one_kg <= Decimal("0"):
+            if shipment.tariff_one_kg <= Decimal(0):
                 raise ValueError("Тариф за 1 кг должен быть больше 0")
 
             return
 
         if calculation_type == LogisticCalculationMethod.VOLUME:
-            if shipment.volume <= Decimal("0"):
+            if shipment.volume <= Decimal(0):
                 raise ValueError("Объем поставки должен быть больше 0")
 
-            if shipment.tariff_one_m3 <= Decimal("0"):
+            if shipment.tariff_one_m3 <= Decimal(0):
                 raise ValueError("Тариф за 1 м3 должен быть больше 0")
 
             return

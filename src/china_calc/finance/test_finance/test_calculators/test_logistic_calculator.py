@@ -3,7 +3,7 @@ from types import SimpleNamespace
 from unittest import TestCase
 
 from china_calc.finance.calculators.logistic_calculator import LogisticCalculator
-from config.model_choices import Currency, LogisticCalculationMethod, DeliveryRouteType
+from config.model_choices import Currency, DeliveryRouteType, LogisticCalculationMethod
 
 
 class TestLogisticCalculator(TestCase):
@@ -11,10 +11,10 @@ class TestLogisticCalculator(TestCase):
     def test_calculate_logistic_by_weight(self):
         shipment = SimpleNamespace(
             logistic_calculation_type=LogisticCalculationMethod.WEIGHT,
-            weight=Decimal("25"),
-            volume=Decimal("0"),
+            weight=Decimal(25),
+            volume=Decimal(0),
             tariff_one_kg=Decimal("3.5"),
-            tariff_one_m3=Decimal("0"),
+            tariff_one_m3=Decimal(0),
             tariff_currency=Currency.USD,
             route_type=DeliveryRouteType.CHINA_BELARUS,
             settlement_final_currency=Currency.BYN,
@@ -35,8 +35,8 @@ class TestLogisticCalculator(TestCase):
             logistic_calculation_type=LogisticCalculationMethod.VOLUME,
             weight=Decimal(0),
             volume=Decimal("0.035"),
-            tariff_one_kg=Decimal("0"),
-            tariff_one_m3=Decimal("350"),
+            tariff_one_kg=Decimal(0),
+            tariff_one_m3=Decimal(350),
             tariff_currency=Currency.USD,
             route_type=DeliveryRouteType.CHINA_BELARUS,
             settlement_final_currency=Currency.BYN,
@@ -55,7 +55,7 @@ class TestLogisticCalculator(TestCase):
     def test_zero_weight(self):
         shipment = SimpleNamespace(
             logistic_calculation_type=LogisticCalculationMethod.WEIGHT,
-            weight=Decimal("0"),
+            weight=Decimal(0),
             tariff_one_kg=Decimal("3.5"),
         )
 
@@ -68,8 +68,8 @@ class TestLogisticCalculator(TestCase):
     def test_zero_volume(self):
         shipment = SimpleNamespace(
             logistic_calculation_type=LogisticCalculationMethod.VOLUME,
-            volume=Decimal("0"),
-            tariff_one_m3=Decimal("350"),
+            volume=Decimal(0),
+            tariff_one_m3=Decimal(350),
         )
 
         with self.assertRaisesRegex(ValueError, "Объем поставки должен быть больше 0"):
@@ -81,8 +81,8 @@ class TestLogisticCalculator(TestCase):
     def test_zero_tariff_one_kg(self):
         shipment = SimpleNamespace(
             logistic_calculation_type=LogisticCalculationMethod.WEIGHT,
-            weight=Decimal("20"),
-            tariff_one_kg=Decimal("0"),
+            weight=Decimal(20),
+            tariff_one_kg=Decimal(0),
         )
 
         with self.assertRaisesRegex(ValueError, "Тариф за 1 кг должен быть больше 0"):
@@ -95,7 +95,7 @@ class TestLogisticCalculator(TestCase):
         shipment = SimpleNamespace(
             logistic_calculation_type=LogisticCalculationMethod.VOLUME,
             volume=Decimal("0.035"),
-            tariff_one_m3=Decimal("0"),
+            tariff_one_m3=Decimal(0),
         )
 
         with self.assertRaisesRegex(ValueError, "Тариф за 1 м3 должен быть больше 0"):

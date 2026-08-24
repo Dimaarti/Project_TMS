@@ -21,7 +21,7 @@ from china_calc.finance.calculators.shipment_expense_calculator import (
 from china_calc.finance.models.calculation_result import CalculationResult
 from china_calc.finance.models.client_calculation_result import ClientCalculationResult
 from china_calc.finance.models.item_calculation_result import ItemCalculationResult
-from config.model_choices import ShipmentStatus, DeliveryRouteType
+from config.model_choices import DeliveryRouteType, ShipmentStatus
 
 
 class ShipmentCalculatorService:
@@ -63,7 +63,7 @@ class ShipmentCalculatorService:
             expenses=expenses_source,
         )
 
-        logistics_cost_rub = Decimal("0")
+        logistics_cost_rub = Decimal(0)
         if shipment.route_type == DeliveryRouteType.CHINA_RUSSIA_BELARUS:
             logistics_cost_rub = (
                 LogisticCalculator.calculate_rub(shipment=shipment)
@@ -76,9 +76,9 @@ class ShipmentCalculatorService:
             client_purchase_costs=client_purchase_costs,
         )
 
-        purchase_cost = sum(purchase_costs.values(), Decimal("0"))
+        purchase_cost = sum(purchase_costs.values(), Decimal(0))
 
-        client_purchase_cost = sum(client_purchase_costs.values(), Decimal("0"))
+        client_purchase_cost = sum(client_purchase_costs.values(), Decimal(0))
 
         price_cost = PriceCostCalculator.calculate(
             purchase_cost=purchase_cost,
@@ -162,11 +162,11 @@ class ShipmentCalculatorService:
             client_item_ids = item_ids_by_client[client_id]
             purchase_cost = sum(
                 (purchase_costs[item_id] for item_id in client_item_ids),
-                Decimal("0"),
+                Decimal(0),
             )
             client_purchase_cost = sum(
                 (client_purchase_costs[item_id] for item_id in client_item_ids),
-                Decimal("0"),
+                Decimal(0),
             )
 
             logistics_cost = logistics.clients[client_id].logistics_cost
@@ -246,9 +246,7 @@ class ShipmentCalculatorService:
                     allocation_ratio=item_logistics.ratio,
                     logistics_cost=item_logistics.logistics_cost,
                     direct_expenses_cost=item_expenses["direct_expenses_cost"],
-                    distributed_expenses_cost=item_expenses[
-                        "distributed_expenses_cost"
-                    ],
+                    distributed_expenses_cost=item_expenses["distributed_expenses_cost"],
                     total_cost=total_cost,
                 )
             )

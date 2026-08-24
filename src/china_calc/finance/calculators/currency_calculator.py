@@ -1,10 +1,11 @@
 from decimal import Decimal
+from typing import ClassVar
 
 from config.model_choices import Currency, DeliveryRouteType
 
 
 class CurrencyCalculator:
-    fields = {
+    fields: ClassVar[dict] = {
         (Currency.CNY, Currency.BYN): "cny_to_byn",
         (Currency.CNY, Currency.RUB): "cny_to_rub",
         (Currency.USD, Currency.BYN): "usd_to_byn",
@@ -12,21 +13,15 @@ class CurrencyCalculator:
         (Currency.RUB, Currency.BYN): "rub_to_byn",
     }
 
-    inverse_fields = {
+    inverse_fields: ClassVar[dict] = {
         (Currency.BYN, Currency.RUB): "rub_to_byn",
     }
 
-    route_targets = {
+    route_targets: ClassVar[dict] = {
         DeliveryRouteType.CHINA_RUSSIA: (Currency.RUB,),
         DeliveryRouteType.CHINA_BELARUS: (Currency.BYN,),
         DeliveryRouteType.CHINA_RUSSIA_BELARUS: (Currency.RUB, Currency.BYN),
     }
-
-    # route_final_currencies = {
-    #     DeliveryRouteType.CHINA_RUSSIA: SettlementFinalCurrency.RUB,
-    #     DeliveryRouteType.CHINA_BELARUS: SettlementFinalCurrency.BYN,
-    #     DeliveryRouteType.CHINA_RUSSIA_BELARUS: SettlementFinalCurrency.BYN,
-    # }
 
     @staticmethod
     def convert_currency(
@@ -122,7 +117,7 @@ class CurrencyCalculator:
         CNY -> BYN
         """
 
-        if amount < Decimal("0"):
+        if amount < Decimal(0):
             raise ValueError("Стоимость товара не может быть отрицательной")
 
         if purchase_currency == final_currency:
@@ -132,9 +127,7 @@ class CurrencyCalculator:
             raise ValueError("Исходной валютой стоимости должен быть CNY")
 
         if final_currency not in (Currency.RUB, Currency.BYN):
-            raise ValueError(
-                "Стоимость товара можно конвертировать только в RUB или BYN"
-            )
+            raise ValueError("Стоимость товара можно конвертировать только в RUB или BYN")
 
         return cls.convert_currency(
             amount=amount,

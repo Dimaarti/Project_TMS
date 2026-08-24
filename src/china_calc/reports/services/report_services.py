@@ -285,7 +285,7 @@ class ShipmentReportServices:
                 link_cell.hyperlink = item.product_link
                 link_cell.style = "Hyperlink"
 
-        width = {
+        column_width = {
             "A": 40,
             "B": 18,
             "C": 16,
@@ -301,7 +301,7 @@ class ShipmentReportServices:
             "M": 18,
         }
 
-        for column, width in width.items():
+        for column, width in column_width.items():
             sheet.column_dimensions[column].width = width
 
         buffer = BytesIO()
