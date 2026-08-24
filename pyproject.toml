@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["dima <dima.arti@mail.ru>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.14"
@@ -18,6 +19,9 @@ django-debug-toolbar = "^7.0.0"
 openpyxl = "^3.1.5"
 redis = "^8.0.1"
 pytest-django = "^4.14.0"
+gunicorn = "^26.2.0"
+uvicorn = "^0.52.4"
+uvicorn-worker = "^0.4.0"
 
 
 [tool.poetry.group.dev.dependencies]
