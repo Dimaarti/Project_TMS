@@ -15,5 +15,5 @@ exec python -m gunicorn \
     --workers 1 \
     --timeout 120 \
     --access-logfile - \
-    --error-loglife - \
+    --error-logfile - \
     config.wsgi:application
