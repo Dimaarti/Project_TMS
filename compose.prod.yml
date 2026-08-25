@@ -1,0 +1,62 @@
+services:
+  web:
+    build:
+      context: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - poetry
+      - run
+      - sh
+      - src/scripts/entrypoint.prod.sh
+    expose:
+      - "8000"
+    volumes:
+      - static_data:/app/static
+      - media_data:/app/media
+    depends_on:
+      postgresql_db:
+        condition: service_healthy
+
+  postgresql_db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${PG_NAME}
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASS}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        CMD-SHELL
+        pg_isready -U ${PG_USER} -d ${PG_NAME}
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - static_data:/srv/static:ro
+      - media_data:/srv/media:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+
+volumes:
+  pg_data:
+  static_data:
+  media_data:
+  caddy_data:
+  caddy_config:
+
+
