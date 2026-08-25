@@ -14,6 +14,6 @@ exec python -m gunicorn \
     --bind 0.0.0.0:8000 \
     --workers 1 \
     --timeout 120 \
-    --access-loglife - \
+    --access-logfile - \
     --error-loglife - \
     config.wsgi:application
