@@ -12,7 +12,8 @@ echo "starting gunicorn"
 exec python -m gunicorn \
     --chdir src \
     --bind 0.0.0.0:8000 \
-    --workers 2 \
+    --workers 1 \
+    --timeout 120 \
     --access-loglife - \
     --error-loglife - \
     config.wsgi:application
