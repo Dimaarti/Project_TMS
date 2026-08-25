@@ -3,7 +3,7 @@
 set -e
 
 echo "applying database migrations"
-python src/manage.py migrations --noinput
+python src/manage.py migrate --noinput
 
 echo "collecting static files"
 python src/manage.py collectstatic --noinput
