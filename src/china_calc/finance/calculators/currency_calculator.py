@@ -46,7 +46,7 @@ class CurrencyCalculator:
 
         if field is None:
             field = CurrencyCalculator.inverse_fields.get(
-                purchase_currency, final_currency
+                (purchase_currency, final_currency)
             )
             is_inverse = field is not None
 
