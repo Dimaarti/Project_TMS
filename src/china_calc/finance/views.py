@@ -169,13 +169,21 @@ class CalculationResultDeleteView(LoginRequiredMixin, DeleteView):
             shipment__user=self.request.user,
         )
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Удаление архивного расчета"
+        context["subtitle"] = f"Поставка №{self.object.shipment.number}"
+        context["delete_mode"] = True
+        context["cancel_url"] = reverse("finance:calculations_list")
+        return context
+
     def form_valid(self, form):
         if self.object.is_actual:
             messages.error(
                 self.request,
                 "Актуальный результат расчёта удалить нельзя",
             )
-            return redirect("finance:calculations_list")
+            return redirect("finance:calculation_result_list")
 
         messages.success(
             self.request,
