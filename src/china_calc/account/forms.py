@@ -1,5 +1,5 @@
-from cfgv import ValidationError
 from django.contrib.auth.forms import UserCreationForm
+from django.core.exceptions import ValidationError
 
 from china_calc.account.models import User
 
