@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-    Расчёт поставки {{ result.shipment.number }}
+Расчёт поставки {{ result.shipment.number }}
 {% endblock %}
 
 {% block content %}
@@ -23,11 +23,11 @@
                 {{ result.created_at|date:"d.m.Y H:i" }}
 
                 {% if result.is_actual %}
-                    <span class="badge text-bg-success ms-2">
+                <span class="badge text-bg-success ms-2">
                         Актуальный
                     </span>
                 {% else %}
-                    <span class="badge text-bg-secondary ms-2">
+                <span class="badge text-bg-secondary ms-2">
                         Архивный
                     </span>
                 {% endif %}
@@ -35,8 +35,8 @@
         </div>
 
         <a
-            href="{% url 'shipment:detail' pk=result.shipment_id %}"
-            class="btn btn-sm btn-outline-secondary"
+                href="{% url 'shipment:detail' pk=result.shipment_id %}"
+                class="btn btn-sm btn-outline-secondary"
         >
             К поставке
         </a>
@@ -44,9 +44,9 @@
 
     {# Предупреждение для архивного расчёта #}
     {% if not result.is_actual %}
-        <div class="alert alert-secondary py-2 mb-4">
-            Это архивный расчёт. Данные показаны на момент его создания.
-        </div>
+    <div class="alert alert-secondary py-2 mb-4">
+        Это архивный расчёт. Данные показаны на момент его создания.
+    </div>
     {% endif %}
 
     {# Основные финансовые показатели #}
@@ -125,14 +125,14 @@
                     </div>
 
                     {% if result.logistics_cost_rub and result.shipment.route_type == "china_russia_belarus" %}
-                        <div class="small text-muted">
-                            Логистика и расходы, справочно:
+                    <div class="small text-muted">
+                        Логистика и расходы, справочно:
 
-                            <span class="fw-semibold">
+                        <span class="fw-semibold">
                                 {{ result.logistics_cost_rub|floatformat:2 }}
                                 RUB
                             </span>
-                        </div>
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -196,224 +196,227 @@
 
     {# Клиенты #}
     {% for client_result in client_results %}
-        <div class="card shadow-sm mb-4">
-            {# Заголовок клиента #}
-            <div class="card-header bg-white py-3">
-                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-                    <div>
-                        <div class="fw-semibold">
-                            {{ client_result.client.full_name }}
-                        </div>
-
-                        <div class="small text-muted">
-                            Комиссия:
-                            {{ client_result.commission_percent|floatformat:2 }}%
-                        </div>
+    <div class="card shadow-sm mb-4">
+        {# Заголовок клиента #}
+        <div class="card-header bg-white py-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <div class="fw-semibold">
+                        {{ client_result.client.full_name }}
                     </div>
 
-                    <a
+                    <div class="small text-muted">
+                        Комиссия:
+                        {{ client_result.commission_percent|floatformat:2 }}%
+                    </div>
+                </div>
+
+                <a
                         href="{% url 'reports:shipment_report' shipment_pk=result.shipment_id client_pk=client_result.client_id %}"
                         class="btn btn-sm btn-outline-success"
-                    >
-                        Скачать отчёт
-                    </a>
+                >
+                    Скачать отчёт
+                </a>
+            </div>
+        </div>
+
+        <div class="card-body">
+            {# Результаты клиента #}
+            <div class="row g-3 mb-4">
+                {# Товары #}
+                <div class="col-6 col-md-4 col-xl-2">
+                    <div class="small text-muted">
+                        Товары
+                    </div>
+
+                    <div class="fw-semibold">
+                        {{ client_result.client_purchase_cost|floatformat:2 }}
+                        {{ result.final_currency }}
+                    </div>
+                </div>
+
+                {# Вес #}
+                <div class="col-6 col-md-4 col-xl-2">
+                    <div class="small text-muted">
+                        Вес
+                    </div>
+
+                    <div class="fw-semibold">
+                        {{ client_result.total_weight|default:"0"|floatformat:3 }}
+                        кг
+                    </div>
+                </div>
+
+                {# Логистика #}
+                <div class="col-6 col-md-4 col-xl-2">
+                    <div class="small text-muted">
+                        Логистика
+                    </div>
+
+                    <div class="fw-semibold">
+                        {{ client_result.logistics_cost|floatformat:2 }}
+                        {{ result.final_currency }}
+                    </div>
+                </div>
+
+                {# Расходы #}
+                <div class="col-6 col-md-4 col-xl-2">
+                    <div class="small text-muted">
+                        Расходы
+                    </div>
+
+                    <div class="fw-semibold">
+                        {{ client_result.expenses_cost|floatformat:2 }}
+                        {{ result.final_currency }}
+                    </div>
+                </div>
+
+                {# Комиссия #}
+                <div class="col-6 col-md-4 col-xl-2">
+                    <div class="small text-muted">
+                        Комиссия
+                    </div>
+
+                    <div class="fw-semibold">
+                        {{ client_result.buyer_commission_cost|floatformat:2 }}
+                        {{ result.final_currency }}
+                    </div>
+                </div>
+
+                {# Итого #}
+                <div class="col-6 col-md-4 col-xl-2">
+                    <div class="small text-muted">
+                        Итого
+                    </div>
+
+                    <div class="fw-semibold text-success">
+                        {{ client_result.client_price_cost|floatformat:2 }}
+                        {{ result.final_currency }}
+                    </div>
                 </div>
             </div>
 
-            <div class="card-body">
-                {# Результаты клиента #}
-                <div class="row g-3 mb-4">
-                    {# Товары #}
-                    <div class="col-6 col-md-4 col-xl-2">
-                        <div class="small text-muted">
-                            Товары
-                        </div>
+            {# Таблица товаров клиента #}
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th>
+                            Товар
+                        </th>
 
-                        <div class="fw-semibold">
-                            {{ client_result.client_purchase_cost|floatformat:2 }}
+                        <th class="text-end text-nowrap">
+                            Вес, кг
+                        </th>
+
+                        <th class="text-end text-nowrap">
+                            Стоимость,
                             {{ result.final_currency }}
-                        </div>
-                    </div>
+                        </th>
 
-                    {# Вес #}
-                    <div class="col-6 col-md-4 col-xl-2">
-                        <div class="small text-muted">
-                            Вес
-                        </div>
-
-                        <div class="fw-semibold">
-                            {{ client_result.total_weight|default:"0"|floatformat:3 }}
-                            кг
-                        </div>
-                    </div>
-
-                    {# Логистика #}
-                    <div class="col-6 col-md-4 col-xl-2">
-                        <div class="small text-muted">
-                            Логистика
-                        </div>
-
-                        <div class="fw-semibold">
-                            {{ client_result.logistics_cost|floatformat:2 }}
+                        <th class="text-end text-nowrap">
+                            Логистика,
                             {{ result.final_currency }}
-                        </div>
-                    </div>
+                        </th>
 
-                    {# Расходы #}
-                    <div class="col-6 col-md-4 col-xl-2">
-                        <div class="small text-muted">
-                            Расходы
-                        </div>
+                        <th class="text-end text-nowrap">
+                            Прямые расходы
+                        </th>
 
-                        <div class="fw-semibold">
-                            {{ client_result.expenses_cost|floatformat:2 }}
+                        <th class="text-end text-nowrap">
+                            Общие расходы
+                        </th>
+
+                        <th class="text-center">
+                            Ссылка
+                        </th>
+
+                        <th class="text-end text-nowrap">
+                            Итого,
                             {{ result.final_currency }}
-                        </div>
-                    </div>
+                        </th>
+                    </tr>
+                    </thead>
 
-                    {# Комиссия #}
-                    <div class="col-6 col-md-4 col-xl-2">
-                        <div class="small text-muted">
-                            Комиссия
-                        </div>
+                    <tbody>
+                    {% for item_result in client_result.item_results.all %}
+                    <tr>
+                        <td>
+                            <div class="fw-semibold">
+                                {{ item_result.item.name }}
+                            </div>
 
-                        <div class="fw-semibold">
-                            {{ client_result.buyer_commission_cost|floatformat:2 }}
-                            {{ result.final_currency }}
-                        </div>
-                    </div>
-
-                    {# Итого #}
-                    <div class="col-6 col-md-4 col-xl-2">
-                        <div class="small text-muted">
-                            Итого
-                        </div>
-
-                        <div class="fw-semibold text-success">
-                            {{ client_result.client_price_cost|floatformat:2 }}
-                            {{ result.final_currency }}
-                        </div>
-                    </div>
-                </div>
-
-                {# Таблица товаров клиента #}
-               <div class="table-responsive">
-    <table class="table table-sm table-hover align-middle mb-0">
-        <thead class="table-light">
-            <tr>
-                <th>
-                    Товар
-                </th>
-
-                <th class="text-end text-nowrap">
-                    Вес, кг
-                </th>
-
-                <th class="text-end text-nowrap">
-                    Стоимость,
-                    {{ result.final_currency }}
-                </th>
-
-                <th class="text-end text-nowrap">
-                    Логистика,
-                    {{ result.final_currency }}
-                </th>
-
-                <th class="text-end text-nowrap">
-                    Прямые расходы
-                </th>
-
-                <th class="text-end text-nowrap">
-                    Общие расходы
-                </th>
-
-                <th class="text-center">
-                    Ссылка
-                </th>
-
-                <th class="text-end text-nowrap">
-                    Итого,
-                    {{ result.final_currency }}
-                </th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for item_result in client_result.item_results.all %}
-                <tr>
-                    <td>
-                        <div class="fw-semibold">
-                            {{ item_result.item.name }}
-                        </div>
-
-                        {% if item_result.item.tracking_number %}
+                            {% if item_result.item.tracking_number %}
                             <div class="small text-muted">
                                 Трек:
                                 {{ item_result.item.tracking_number }}
                             </div>
-                        {% endif %}
-                    </td>
+                            {% endif %}
+                        </td>
 
-                    <td class="text-end text-nowrap">
-                        {{ item_result.item.weight|default:"0"|floatformat:3 }}
-                    </td>
+                        <td class="text-end text-nowrap">
+                            {{ item_result.item.weight|default:"0"|floatformat:3 }}
+                        </td>
 
-                    <td class="text-end text-nowrap">
-                        {{ item_result.client_purchase_cost|floatformat:2 }}
-                    </td>
+                        <td class="text-end text-nowrap">
+                            {{ item_result.client_purchase_cost|floatformat:2 }}
+                        </td>
 
-                    <td class="text-end text-nowrap">
-                        {{ item_result.logistics_cost|floatformat:2 }}
-                    </td>
+                        <td class="text-end text-nowrap">
+                            {{ item_result.logistics_cost|floatformat:2 }}
+                        </td>
 
-                    <td class="text-end text-nowrap">
-                        {{ item_result.direct_expenses_cost|floatformat:2 }}
-                    </td>
+                        <td class="text-end text-nowrap">
+                            {{ item_result.direct_expenses_cost|floatformat:2 }}
+                        </td>
 
-                    <td class="text-end text-nowrap">
-                        {{ item_result.distributed_expenses_cost|floatformat:2 }}
-                    </td>
+                        <td class="text-end text-nowrap">
+                            {{ item_result.distributed_expenses_cost|floatformat:2 }}
+                        </td>
 
-                    <td class="text-center">
-                        {% if item_result.item.product_link %}
+                        <td class="text-center">
+                            {% if item_result.item.product_link %}
                             <a
-                                href="{{ item_result.item.product_link }}"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="btn btn-sm btn-outline-secondary"
+                                    href="{{ item_result.item.product_link }}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="btn btn-sm btn-outline-secondary"
                             >
                                 Открыть ↗
                             </a>
-                        {% else %}
+                            {% else %}
                             <span class="text-muted">
                                 —
                             </span>
-                        {% endif %}
-                    </td>
+                            {% endif %}
+                        </td>
 
-                    <td class="text-end text-nowrap fw-semibold">
-                        {{ item_result.total_cost|floatformat:2 }}
-                    </td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td
-                        colspan="8"
-                        class="text-center text-muted py-4"
-                    >
-                        У клиента нет товаров в этом расчёте.
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-    {% empty %}
-        <div class="card shadow-sm">
-            <div class="card-body text-center text-muted py-5">
-                Клиентов в расчёте нет.
+                        <td class="text-end text-nowrap fw-semibold">
+                            {{ item_result.total_cost|floatformat:2 }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td
+                                colspan="8"
+                                class="text-center text-muted py-4"
+                        >
+                            У клиента нет товаров в этом расчёте.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
+    </div>
+
+    {% empty %}
+    <div class="card shadow-sm">
+        <div class="card-body text-center text-muted py-5">
+            Клиентов в расчёте нет.
+        </div>
+    </div>
     {% endfor %}
 </div>
 {% endblock %}

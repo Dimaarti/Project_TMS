@@ -18,12 +18,12 @@
             </div>
 
             {% if form.non_field_errors %}
-                <div
+            <div
                     class="alert alert-danger py-2 small"
                     role="alert"
-                >
-                    Неверный email или пароль.
-                </div>
+            >
+                Неверный email или пароль.
+            </div>
             {% endif %}
 
             <form method="post" novalidate>
@@ -32,68 +32,68 @@
                 {# Email #}
                 <div class="mb-3">
                     <label
-                        for="id_username"
-                        class="form-label"
+                            for="id_username"
+                            class="form-label"
                     >
                         Email
                     </label>
 
                     <input
-                        type="email"
-                        name="username"
-                        id="id_username"
-                        value="{{ form.username.value|default_if_none:'' }}"
-                        class="form-control{% if form.username.errors %} is-invalid{% endif %}"
-                        placeholder="name@example.com"
-                        autocomplete="username"
-                        autofocus
-                        required
+                            type="email"
+                            name="username"
+                            id="id_username"
+                            value="{{ form.username.value|default_if_none:'' }}"
+                            class="form-control{% if form.username.errors %} is-invalid{% endif %}"
+                            placeholder="name@example.com"
+                            autocomplete="username"
+                            autofocus
+                            required
                     >
 
                     {% if form.username.errors %}
-                        <div class="invalid-feedback">
-                            Введите email.
-                        </div>
+                    <div class="invalid-feedback">
+                        Введите email.
+                    </div>
                     {% endif %}
                 </div>
 
                 {# Пароль #}
                 <div class="mb-4">
                     <label
-                        for="id_password"
-                        class="form-label"
+                            for="id_password"
+                            class="form-label"
                     >
                         Пароль
                     </label>
 
                     <input
-                        type="password"
-                        name="password"
-                        id="id_password"
-                        class="form-control{% if form.password.errors %} is-invalid{% endif %}"
-                        placeholder="Введите пароль"
-                        autocomplete="current-password"
-                        required
+                            type="password"
+                            name="password"
+                            id="id_password"
+                            class="form-control{% if form.password.errors %} is-invalid{% endif %}"
+                            placeholder="Введите пароль"
+                            autocomplete="current-password"
+                            required
                     >
 
                     {% if form.password.errors %}
-                        <div class="invalid-feedback">
-                            Введите пароль.
-                        </div>
+                    <div class="invalid-feedback">
+                        Введите пароль.
+                    </div>
                     {% endif %}
                 </div>
 
                 {% if next %}
-                    <input
+                <input
                         type="hidden"
                         name="next"
                         value="{{ next }}"
-                    >
+                >
                 {% endif %}
 
                 <button
-                    type="submit"
-                    class="btn btn-dark w-100"
+                        type="submit"
+                        class="btn btn-dark w-100"
                 >
                     Войти
                 </button>
@@ -104,5 +104,13 @@
             Доступ только для зарегистрированных пользователей
         </div>
     </div>
+</div>
+
+<div class="text-center mt-3">
+    Нет учётной записи?
+
+    <a href="{% url 'account:register' %}">
+        Зарегистрироваться
+    </a>
 </div>
 {% endblock %}
