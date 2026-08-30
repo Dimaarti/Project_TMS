@@ -2,9 +2,10 @@ from decimal import Decimal
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Sum
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, UpdateView
+from django.db.models import ProtectedError, Sum
+from django.shortcuts import redirect
+from django.urls import reverse, reverse_lazy
+from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
 from china_calc.client.forms import ClientForm
 from china_calc.client.models import Client
@@ -113,3 +114,39 @@ class ClientUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy("client:list")
+
+
+class ClientDeleteView(LoginRequiredMixin, DeleteView):
+    model = Client
+    template_name = "universal_form.html"
+    success_url = reverse_lazy("client:list")
+
+    def get_queryset(self):
+        return Client.objects.filter(
+            user=self.request.user,
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = "Удаление клиента"
+        context["delete_mode"] = True
+        context["cancel_url"] = reverse("client:list")
+        return context
+
+    def form_valid(self, form):
+        try:
+            response = super().form_valid(form)
+        except ProtectedError:
+            messages.error(
+                self.request,
+                (
+                    "Удалить клиента нельзя, потому что он используется"
+                    "в товарах или расчетах"
+                ),
+            )
+            return redirect("client:list")
+        messages.success(
+            self.request,
+            "Клиент удалён",
+        )
+        return response
