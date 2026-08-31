@@ -73,6 +73,11 @@ jobs:
 
       - name: Установка Poetry
         run: |
+          python -m pip install --upgrade pip
+          python -m pip install poetry
+
+      - name: Установка зависимостей
+        run: |
           poetry install \
             --no-root \
             --no-interaction
