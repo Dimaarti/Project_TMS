@@ -1,0 +1,107 @@
+name: China Calc CI
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Django checks
+    runs-on: ubuntu-latest
+
+    env:
+      SECRET_KEY: ci-temporary-secret-key
+      DEBUG: "False"
+
+      ALLOWED_HOSTS: localhost,127.0.0.1,testserver
+      LANGUAGE_CODE: ru
+      TIME_ZONE: Europe/Minsk
+
+      SECURE_SSL_REDIRECT: "False"
+      SESSION_COOKIE_SECURE: "False"
+      CSRF_COOKIE_SECURE: "False"
+      CSRF_TRUSTED_ORIGINS: http://localhost,http://127.0.0.1
+
+      PG_HOST: 127.0.0.1
+      PG_PORT: "5432"
+      PG_NAME: china_calc
+      PG_TEST_NAME: test_china_calc
+      PG_USER: postgres
+      PG_PASS: postgres
+
+    services:
+      postgres:
+        image: postgres:17
+
+        env:
+          POSTGRES_DB: china_calc
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+
+        ports:
+          - 5432:5432
+
+        options: >-
+          --health-cmd "pg_isready -U postgres -d china_calc"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Получение кода
+        uses: actions/checkout@v7
+
+      - name: Установка Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
+      - name: Установка Poetry
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install poetry
+
+      - name: Установка зависимостей
+        run: |
+          poetry install \
+            --no-root \
+            --no-interaction
+
+      - name: Проверка Ruff
+        run: poetry run ruff check src
+
+      - name: Проверка форматирования
+        run: poetry run ruff format --check src
+
+      - name: Проверка Django
+        run: poetry run python src/manage.py check
+
+      - name: Проверка миграций
+        run: |
+          poetry run python src/manage.py makemigrations \
+            --check \
+            --dry-run
+
+      - name: Запуск тестов
+        run: |
+          poetry run python src/manage.py test \
+            --noinput
+
+      - name: Проверка Docker-сборки
+        run: docker build --tag chinacalc:ci .
+        
