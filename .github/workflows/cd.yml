@@ -28,66 +28,31 @@ jobs:
       name: production
 
     steps:
-      - name: Настройка SSH
-        env:
-          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
-
-        run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          
-          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/chinacalc_deploy
-          chmod 600 ~/.ssh/chinacalc_deploy
-          
-          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
-
       - name: Deploy на production
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
 
-        run: |
-          ssh \
-            -i ~/.ssh/chinacalc_deploy \
-            "$DEPLOY_USER@$DEPLOY_HOST" << 'EOF'
-          
-          set -eu
-              
-          cd /opt/chinacalc
-          
-          echo "Получение новой версии"
-          git fetch origin main
-
-          echo "Обновление production до origin/main"
-          git reset --hard origin/main
-          
-          echo "Сборка и запуск контейнеров"
-          docker compose -f compose.prod.yml up \
-            -d \
-            --build \
-            --remove-orphans
-          
-          echo "Ожидание запуска приложения"
-          sleep 10
-          
-          echo "Состояние контейнеров:"
-          docker compose -f compose.prod.yml ps
-          
-          echo "Проверка web-контейнера"
-          
-          if ! docker compose -f compose.prod.yml \
-            ps --status running --services | grep -qx web
-          then
-            echo "Web-контейнер не запущен"
-          
-            docker compose -f compose.prod.yml \
-              logs --tail=100 web
+          script: |
+            set -e
             
-            exit 1
-          fi
-          
-          echo "Deploy успешно завершен"
-          
-          EOF
+            cd /opt/chinacalc
+            
+            echo "Получение новой версии"
+            git fetch origin main
+            
+            echo "Обновление production"
+            git reset --hard origin/main
+            
+            echo "Сборка и запуск контейнеров"
+            docker compose -f compose.prod.yml up \
+              -d \
+              --build \
+              --remove-orphans
+            
+            echo "Состояние контейнеров"
+            docker compose -f compose.prod.yml ps
+            
+            echo "Deploy успешно завершен"
