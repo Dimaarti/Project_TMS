@@ -56,6 +56,7 @@ class ShipmentItemForm(forms.ModelForm):
             "price_currency",
             "weight",
             "volume",
+            "in_stock",
         ]
 
         widgets = {
@@ -68,6 +69,7 @@ class ShipmentItemForm(forms.ModelForm):
             "price_currency": forms.Select(attrs={"class": "form-select"}),
             "weight": forms.NumberInput(attrs={"class": "form-control"}),
             "volume": forms.NumberInput(attrs={"class": "form-control"}),
+            "in_stock": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
 

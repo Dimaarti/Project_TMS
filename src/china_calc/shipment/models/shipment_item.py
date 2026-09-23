@@ -52,6 +52,8 @@ class ShipmentItem(BaseModel):
         verbose_name="Общий объем позиции, м3",
     )
 
+    in_stock = models.BooleanField(default=False, verbose_name="На складе")
+
     class Meta:
         ordering = ["-client_id", "-name"]
         verbose_name = "Товар для отправки"
