@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-    Поставка {{ shipment.number }}
+Поставка {{ shipment.number }}
 {% endblock %}
 
 {% block content %}
@@ -15,9 +15,8 @@
     }
 
     .summary-card {
-        transition:
-            border-color 0.15s ease,
-            box-shadow 0.15s ease;
+        transition: border-color 0.15s ease,
+        box-shadow 0.15s ease;
     }
 
     .summary-card:hover {
@@ -28,14 +27,14 @@
 
 <div class="container py-3">
     {# ===================================================== #}
-    {# Заголовок поставки                                    #}
+    {# Заголовок поставки #}
     {# ===================================================== #}
 
     <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
         <div>
             <a
-                href="{% url 'shipment:list' %}"
-                class="small text-muted text-decoration-none"
+                    href="{% url 'shipment:list' %}"
+                    class="small text-muted text-decoration-none"
             >
                 ← Все поставки
             </a>
@@ -53,33 +52,33 @@
 
         <div class="d-flex flex-wrap gap-2">
             <a
-                href="{% url 'shipment:update' pk=shipment.pk %}"
-                class="btn btn-sm btn-outline-secondary"
+                    href="{% url 'shipment:update' pk=shipment.pk %}"
+                    class="btn btn-sm btn-outline-secondary"
             >
                 Изменить
             </a>
 
             <a
-                href="{% url 'shipment:delete' pk=shipment.pk %}"
-                class="btn btn-sm btn-outline-danger"
+                    href="{% url 'shipment:delete' pk=shipment.pk %}"
+                    class="btn btn-sm btn-outline-danger"
             >
                 Удалить
             </a>
 
             <form
-                method="post"
-                action="{% url 'shipment:calculate' pk=shipment.pk %}"
+                    method="post"
+                    action="{% url 'shipment:calculate' pk=shipment.pk %}"
             >
                 {% csrf_token %}
 
                 <button
-                    type="submit"
-                    class="btn btn-sm btn-primary"
+                        type="submit"
+                        class="btn btn-sm btn-primary"
                 >
                     {% if actual_result %}
-                        Пересчитать
+                    Пересчитать
                     {% else %}
-                        Рассчитать
+                    Рассчитать
                     {% endif %}
                 </button>
             </form>
@@ -87,7 +86,7 @@
     </div>
 
     {# ===================================================== #}
-    {# Основные параметры                                    #}
+    {# Основные параметры #}
     {# ===================================================== #}
 
     <div class="row g-3 mb-3">
@@ -149,7 +148,7 @@
     </div>
 
     {# ===================================================== #}
-    {# Курсы, тариф и валюта                                 #}
+    {# Курсы, тариф и валюта #}
     {# ===================================================== #}
 
     <div class="border rounded-3 bg-white p-3 mb-4">
@@ -187,9 +186,9 @@
 
                 <div class="fw-semibold">
                     {% if actual_result %}
-                        {{ actual_result.final_currency }}
+                    {{ actual_result.final_currency }}
                     {% else %}
-                        {{ shipment.settlement_final_currency }}
+                    {{ shipment.settlement_final_currency }}
                     {% endif %}
                 </div>
             </div>
@@ -197,7 +196,7 @@
     </div>
 
     {# ===================================================== #}
-    {# Результат расчёта — перенесён выше товаров            #}
+    {# Результат расчёта — перенесён выше товаров #}
     {# ===================================================== #}
 
     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -212,89 +211,89 @@
         </div>
 
         {% if actual_result %}
-            <a
+        <a
                 href="{% url 'finance:calculations_detail' pk=actual_result.pk %}"
                 class="btn btn-sm btn-outline-primary"
-            >
-                Подробнее
-            </a>
+        >
+            Подробнее
+        </a>
         {% endif %}
     </div>
 
     {% if actual_result %}
-        <div class="row g-3 mb-4">
-            <div class="col-6 col-lg-3">
-                <div class="summary-card border rounded-3 bg-white p-3 h-100">
-                    <div class="small text-muted mb-1">
-                        Себестоимость
-                    </div>
-
-                    <div class="h5 mb-0">
-                        {{ actual_result.price_cost|floatformat:2 }}
-
-                        <span class="fs-6 text-muted">
-                            {{ actual_result.final_currency }}
-                        </span>
-                    </div>
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="summary-card border rounded-3 bg-white p-3 h-100">
+                <div class="small text-muted mb-1">
+                    Себестоимость
                 </div>
-            </div>
 
-            <div class="col-6 col-lg-3">
-                <div class="summary-card border rounded-3 bg-white p-3 h-100">
-                    <div class="small text-muted mb-1">
-                        Логистика
-                    </div>
+                <div class="h5 mb-0">
+                    {{ actual_result.price_cost|floatformat:2 }}
 
-                    <div class="h5 mb-0">
-                        {{ actual_result.logistics_cost|floatformat:2 }}
-
-                        <span class="fs-6 text-muted">
+                    <span class="fs-6 text-muted">
                             {{ actual_result.final_currency }}
                         </span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-6 col-lg-3">
-                <div class="summary-card border rounded-3 bg-white p-3 h-100">
-                    <div class="small text-muted mb-1">
-                        Итого клиентам
-                    </div>
-
-                    <div class="h5 mb-0">
-                        {{ actual_result.client_price_cost|floatformat:2 }}
-
-                        <span class="fs-6 text-muted">
-                            {{ actual_result.final_currency }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-6 col-lg-3">
-                <div class="summary-card border border-success rounded-3 bg-white p-3 h-100">
-                    <div class="small text-muted mb-1">
-                        Прибыль
-                    </div>
-
-                    <div class="h5 mb-0 text-success">
-                        {{ actual_result.profit_cost|floatformat:2 }}
-
-                        <span class="fs-6">
-                            {{ actual_result.final_currency }}
-                        </span>
-                    </div>
                 </div>
             </div>
         </div>
+
+        <div class="col-6 col-lg-3">
+            <div class="summary-card border rounded-3 bg-white p-3 h-100">
+                <div class="small text-muted mb-1">
+                    Логистика
+                </div>
+
+                <div class="h5 mb-0">
+                    {{ actual_result.logistics_cost|floatformat:2 }}
+
+                    <span class="fs-6 text-muted">
+                            {{ actual_result.final_currency }}
+                        </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+            <div class="summary-card border rounded-3 bg-white p-3 h-100">
+                <div class="small text-muted mb-1">
+                    Итого клиентам
+                </div>
+
+                <div class="h5 mb-0">
+                    {{ actual_result.client_price_cost|floatformat:2 }}
+
+                    <span class="fs-6 text-muted">
+                            {{ actual_result.final_currency }}
+                        </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+            <div class="summary-card border border-success rounded-3 bg-white p-3 h-100">
+                <div class="small text-muted mb-1">
+                    Прибыль
+                </div>
+
+                <div class="h5 mb-0 text-success">
+                    {{ actual_result.profit_cost|floatformat:2 }}
+
+                    <span class="fs-6">
+                            {{ actual_result.final_currency }}
+                        </span>
+                </div>
+            </div>
+        </div>
+    </div>
     {% else %}
-        <div class="alert alert-info py-3 mb-4">
-            Расчёт поставки ещё не выполнен.
-        </div>
+    <div class="alert alert-info py-3 mb-4">
+        Расчёт поставки ещё не выполнен.
+    </div>
     {% endif %}
 
     {# ===================================================== #}
-    {# Товары                                                #}
+    {# Товары #}
     {# ===================================================== #}
 
     <div class="d-flex justify-content-between align-items-end gap-3 mb-2">
@@ -310,21 +309,21 @@
 
         <div class="d-flex flex-wrap gap-2">
             {% if shipment.items.count %}
-                <button
+            <button
                     type="button"
                     class="btn btn-sm btn-outline-secondary"
                     data-bs-toggle="collapse"
                     data-bs-target="#shipment-items"
                     aria-expanded="true"
                     aria-controls="shipment-items"
-                >
-                    Свернуть / развернуть
-                </button>
+            >
+                Свернуть / развернуть
+            </button>
             {% endif %}
 
             <a
-                href="{% url 'shipment:item_create' shipment_pk=shipment.pk %}"
-                class="btn btn-sm btn-primary"
+                    href="{% url 'shipment:item_create' shipment_pk=shipment.pk %}"
+                    class="btn btn-sm btn-primary"
             >
                 + Добавить
             </a>
@@ -336,108 +335,121 @@
             <div class="table-responsive">
                 <table class="table table-sm align-middle mb-0">
                     <thead class="table-light">
-                        <tr>
-                            <th>Товар</th>
-                            <th>Количество и цена</th>
-                            <th>Вес и объём</th>
-                            <th>Ссылка</th>
-                            <th class="text-end">Действия</th>
-                        </tr>
+                    <tr>
+                        <th>Товар</th>
+                        <th>Количество и цена</th>
+                        <th>Вес и объём</th>
+                        <th class="text-center">Склад</th>
+                        <th>Ссылка</th>
+                        <th class="text-end">Действия</th>
+                    </tr>
                     </thead>
 
                     <tbody>
-                        {% for item in shipment.items.all %}
-                            <tr class="data-row">
-                                <td style="min-width: 300px;">
-                                    <div class="fw-semibold">
-                                        {{ item.name }}
-                                    </div>
+                    {% for item in shipment.items.all %}
+                    <tr class="data-row">
+                        <td style="min-width: 300px;">
+                            <div class="fw-semibold">
+                                {{ item.name }}
+                            </div>
 
-                                    <div class="small text-muted">
-                                        {{ item.client.full_name }}
-                                    </div>
+                            <div class="small text-muted">
+                                {{ item.client.full_name }}
+                            </div>
 
-                                    <div class="small">
+                            <div class="small">
                                         <span class="fw-medium">
                                             Трек:
                                         </span>
 
-                                        {% if item.tracking_number %}
-                                            {{ item.tracking_number }}
-                                        {% else %}
-                                            —
-                                        {% endif %}
-                                    </div>
-                                </td>
+                                {% if item.tracking_number %}
+                                {{ item.tracking_number }}
+                                {% else %}
+                                —
+                                {% endif %}
+                            </div>
+                        </td>
 
-                                <td class="text-nowrap">
-                                    <div>
-                                        {{ item.quantity }} шт.
-                                    </div>
+                        <td class="text-nowrap">
+                            <div>
+                                {{ item.quantity }} шт.
+                            </div>
 
-                                    <div class="small text-muted">
-                                        {{ item.price|floatformat:2 }}
-                                        {{ item.price_currency }}
-                                    </div>
-                                </td>
+                            <div class="small text-muted">
+                                {{ item.price|floatformat:2 }}
+                                {{ item.price_currency }}
+                            </div>
+                        </td>
 
-                                <td class="text-nowrap">
-                                    <div>
-                                        {{ item.weight|floatformat:3 }} кг
-                                    </div>
+                        <td class="text-nowrap">
+                            <div>
+                                {{ item.weight|floatformat:3 }} кг
+                            </div>
 
-                                    <div class="small text-muted">
-                                        {{ item.volume|floatformat:3 }} м³
-                                    </div>
-                                </td>
+                            <div class="small text-muted">
+                                {{ item.volume|floatformat:3 }} м³
+                            </div>
+                        </td>
 
-                                <td>
-                                    {% if item.product_link %}
-                                        <a
-                                            href="{{ item.product_link }}"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            class="btn btn-sm btn-outline-secondary"
-                                            title="Открыть страницу товара"
-                                        >
-                                            Ссылка ↗
-                                        </a>
-                                    {% else %}
-                                        <span class="text-muted">
+                        <td class="text-center text-nowrap">
+                            {% if item.in_stock %}
+                            <span class="badge bg-success">
+            На складе
+        </span>
+                            {% else %}
+                            <span class="badge bg-secondary">
+            Не прибыл
+        </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if item.product_link %}
+                            <a
+                                    href="{{ item.product_link }}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="btn btn-sm btn-outline-secondary"
+                                    title="Открыть страницу товара"
+                            >
+                                Ссылка ↗
+                            </a>
+                            {% else %}
+                            <span class="text-muted">
                                             —
                                         </span>
-                                    {% endif %}
-                                </td>
+                            {% endif %}
+                        </td>
 
-                                <td class="text-end text-nowrap">
-                                    <div class="btn-group btn-group-sm">
-                                        <a
-                                            href="{% url 'shipment:item_update' pk=item.pk %}"
-                                            class="btn btn-outline-secondary"
-                                        >
-                                            Изменить
-                                        </a>
-
-                                        <a
-                                            href="{% url 'shipment:item_delete' pk=item.pk %}"
-                                            class="btn btn-outline-danger"
-                                            title="Удалить товар"
-                                        >
-                                            ×
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        {% empty %}
-                            <tr>
-                                <td
-                                    colspan="5"
-                                    class="text-center text-muted py-4"
+                        <td class="text-end text-nowrap">
+                            <div class="btn-group btn-group-sm">
+                                <a
+                                        href="{% url 'shipment:item_update' pk=item.pk %}"
+                                        class="btn btn-outline-secondary"
                                 >
-                                    В поставке пока нет товаров.
-                                </td>
-                            </tr>
-                        {% endfor %}
+                                    Изменить
+                                </a>
+
+                                <a
+                                        href="{% url 'shipment:item_delete' pk=item.pk %}"
+                                        class="btn btn-outline-danger"
+                                        title="Удалить товар"
+                                >
+                                    ×
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td
+                                colspan="5"
+                                class="text-center text-muted py-4"
+                        >
+                            В поставке пока нет товаров.
+                        </td>
+                    </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -445,7 +457,7 @@
     </div>
 
     {# ===================================================== #}
-    {# Расходы                                               #}
+    {# Расходы #}
     {# ===================================================== #}
 
     <div class="d-flex justify-content-between align-items-end gap-3 mb-2">
@@ -460,8 +472,8 @@
         </div>
 
         <a
-            href="{% url 'shipment:expense_create' shipment_pk=shipment.pk %}"
-            class="btn btn-sm btn-primary"
+                href="{% url 'shipment:expense_create' shipment_pk=shipment.pk %}"
+                class="btn btn-sm btn-primary"
         >
             + Добавить
         </a>
@@ -471,68 +483,68 @@
         <div class="table-responsive">
             <table class="table table-sm align-middle mb-0">
                 <thead class="table-light">
-                    <tr>
-                        <th>Тип</th>
-                        <th>Назначение</th>
-                        <th>Сумма</th>
-                        <th class="text-end">Действия</th>
-                    </tr>
+                <tr>
+                    <th>Тип</th>
+                    <th>Назначение</th>
+                    <th>Сумма</th>
+                    <th class="text-end">Действия</th>
+                </tr>
                 </thead>
 
                 <tbody>
-                    {% for expense in shipment.expenses.all %}
-                        <tr class="data-row">
-                            <td>
-                                {{ expense.get_expense_type_display }}
-                            </td>
+                {% for expense in shipment.expenses.all %}
+                <tr class="data-row">
+                    <td>
+                        {{ expense.get_expense_type_display }}
+                    </td>
 
-                            <td>
-                                {% if expense.item %}
-                                    {{ expense.item.name }}
-                                    <span class="text-muted">
+                    <td>
+                        {% if expense.item %}
+                        {{ expense.item.name }}
+                        <span class="text-muted">
                                         · {{ expense.item.client.full_name }}
                                     </span>
-                                {% else %}
-                                    <span class="text-muted">
+                        {% else %}
+                        <span class="text-muted">
                                         Общий расход
                                     </span>
-                                {% endif %}
-                            </td>
+                        {% endif %}
+                    </td>
 
-                            <td class="fw-semibold text-nowrap">
-                                {{ expense.amount|floatformat:2 }}
-                                {{ expense.currency }}
-                            </td>
+                    <td class="fw-semibold text-nowrap">
+                        {{ expense.amount|floatformat:2 }}
+                        {{ expense.currency }}
+                    </td>
 
-                            <td class="text-end text-nowrap">
-                                <div class="btn-group btn-group-sm">
-                                    <a
-                                        href="{% url 'shipment:expense_update' pk=expense.pk %}"
-                                        class="btn btn-outline-secondary"
-                                    >
-                                        Изменить
-                                    </a>
-
-                                    <a
-                                        href="{% url 'shipment:expense_delete' pk=expense.pk %}"
-                                        class="btn btn-outline-danger"
-                                        title="Удалить расход"
-                                    >
-                                        ×
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td
-                                colspan="4"
-                                class="text-center text-muted py-4"
+                    <td class="text-end text-nowrap">
+                        <div class="btn-group btn-group-sm">
+                            <a
+                                    href="{% url 'shipment:expense_update' pk=expense.pk %}"
+                                    class="btn btn-outline-secondary"
                             >
-                                Дополнительных расходов нет.
-                            </td>
-                        </tr>
-                    {% endfor %}
+                                Изменить
+                            </a>
+
+                            <a
+                                    href="{% url 'shipment:expense_delete' pk=expense.pk %}"
+                                    class="btn btn-outline-danger"
+                                    title="Удалить расход"
+                            >
+                                ×
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td
+                            colspan="4"
+                            class="text-center text-muted py-4"
+                    >
+                        Дополнительных расходов нет.
+                    </td>
+                </tr>
+                {% endfor %}
                 </tbody>
             </table>
         </div>
