@@ -129,6 +129,9 @@
 
                     <div class="row g-3">
                         <div class="col-md-4">
+                            {{ form.box_weight|as_crispy_field }}
+                            <small class="form-text text-muted mb-3">Укажите вес коробки. Он будет пропорционально
+                                распределен между клиентами.</small>
                             <div class="border rounded-3 p-3 h-100 bg-light">
                                 <div class="small text-muted mb-1">
                                     Общий вес

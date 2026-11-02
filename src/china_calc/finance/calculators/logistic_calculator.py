@@ -40,7 +40,8 @@ class LogisticCalculator:
         cls.validate(shipment)
 
         if shipment.logistic_calculation_type == LogisticCalculationMethod.WEIGHT:
-            return shipment.weight * shipment.tariff_one_kg
+            box_weight = getattr(shipment, "box_weight", Decimal(0)) or Decimal(0)
+            return (shipment.weight + box_weight) * shipment.tariff_one_kg
 
         if shipment.logistic_calculation_type == LogisticCalculationMethod.VOLUME:
             return shipment.volume * shipment.tariff_one_m3
@@ -54,14 +55,7 @@ class LogisticCalculator:
         """
         cls.validate(shipment=shipment)
 
-        if shipment.logistic_calculation_type == LogisticCalculationMethod.WEIGHT:
-            amount = shipment.weight * shipment.tariff_one_kg
-
-        elif shipment.logistic_calculation_type == LogisticCalculationMethod.VOLUME:
-            amount = shipment.volume * shipment.tariff_one_m3
-
-        else:
-            raise ValueError("Неизвестный способ расчета логистики")
+        amount = cls.calculate_tariff_amount(shipment=shipment)
 
         return CurrencyCalculator.convert_for_route(
             amount=amount,

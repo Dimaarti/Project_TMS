@@ -242,7 +242,7 @@
                     </div>
 
                     <div class="fw-semibold">
-                        {{ client_result.total_weight|default:"0"|floatformat:3 }}
+                        {{ client_result.total_weight|add:result.shipment.box_weight|floatformat:3 }}
                         кг
                     </div>
                 </div>
@@ -355,7 +355,11 @@
                         </td>
 
                         <td class="text-end text-nowrap">
-                            {{ item_result.item.weight|default:"0"|floatformat:3 }}
+                            {{ item_result.allocation_basis|floatformat:3 }} кг
+                            <br>
+                            <small class="text-muted" style="font-size: 0.75rem;">
+                                (чистый: {{ item_result.item.weight|floatformat:3 }} кг)
+                            </small>
                         </td>
 
                         <td class="text-end text-nowrap">

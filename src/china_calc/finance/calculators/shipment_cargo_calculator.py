@@ -31,14 +31,18 @@ class ShipmentCargoCalculator:
 
         totals = self.calculate()
 
+        box_weight = getattr(self.shipment, "box_weight", Decimal(0)) or Decimal(0)
+
+        total_weight_with_box = totals["weight"] + box_weight
+
         Shipment.objects.filter(
             pk=self.shipment.pk,
         ).update(
-            weight=totals["weight"],
+            weight=total_weight_with_box,
             volume=totals["volume"],
         )
 
-        self.shipment.weight = totals["weight"]
+        self.shipment.weight = total_weight_with_box
         self.shipment.volume = totals["volume"]
 
-        return totals
+        return {"weight": total_weight_with_box, "volume": totals["volume"]}
