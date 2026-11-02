@@ -121,7 +121,23 @@
                 </div>
 
                 <div class="h5 mb-0">
-                    {{ shipment.weight|floatformat:3 }}
+                    {{ shipment.weight|add:shipment.box_weight|floatformat:3 }}
+
+                    <span class="fs-6 text-muted">
+                        кг
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+            <div class="summary-card border rounded-3 bg-white p-3 h-100">
+                <div class="small text-muted mb-1">
+                    Вес коробки
+                </div>
+
+                <div class="h5 mb-0">
+                    {{ shipment.box_weight|floatformat:3 }}
 
                     <span class="fs-6 text-muted">
                         кг

@@ -73,6 +73,26 @@ class LogisticAllocationCalculator:
             items=items,
         )
 
+        total_goods_basis = sum(basis_item.values(), Decimal(0))
+
+        if total_goods_basis <= Decimal(0):
+            raise ValueError("Невозможно распределить логистику")
+
+        box_weight = getattr(shipment, "box_weight", Decimal(0)) or Decimal(0)
+
+        if (
+            shipment.logistic_calculation_type == LogisticCalculationMethod.WEIGHT
+            and box_weight > Decimal(0)
+        ):
+            box_weight_allocations = ProportionalAllocationCalculator.allocate(
+                items=items,
+                total_amount=box_weight,
+                basis_item=basis_item,
+                total_basis=total_goods_basis,
+            )
+            for item_pk in basis_item:
+                basis_item[item_pk] += box_weight_allocations[item_pk]
+
         total_basis = sum(basis_item.values(), Decimal(0))
 
         if total_basis <= Decimal(0):

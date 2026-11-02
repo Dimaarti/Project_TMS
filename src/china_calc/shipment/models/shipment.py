@@ -63,6 +63,13 @@ class Shipment(BaseModel):
         verbose_name="Фактический вес поставки, кг",
     )
 
+    box_weight = models.DecimalField(
+        max_digits=10,
+        decimal_places=3,
+        default=0,
+        verbose_name="Фактический вес коробки, кг",
+    )
+
     volume = models.DecimalField(
         max_digits=10,
         decimal_places=2,
