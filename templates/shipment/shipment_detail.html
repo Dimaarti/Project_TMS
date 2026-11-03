@@ -356,6 +356,7 @@
                         <th>Количество и цена</th>
                         <th>Вес и объём</th>
                         <th class="text-center">Склад</th>
+                        <th class="text-center">Фотоотчет</th>
                         <th>Ссылка</th>
                         <th class="text-end">Действия</th>
                     </tr>
@@ -418,6 +419,19 @@
         </span>
                             {% endif %}
                         </td>
+
+                        <td class="text-center text-nowrap">
+                            {% if item.photo_report %}
+                            <span class="badge bg-success">
+            Да
+        </span>
+                            {% else %}
+                            <span class="badge bg-secondary">
+            Нет
+        </span>
+                            {% endif %}
+                        </td>
+
 
                         <td>
                             {% if item.product_link %}
