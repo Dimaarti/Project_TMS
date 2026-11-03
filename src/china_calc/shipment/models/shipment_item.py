@@ -54,6 +54,8 @@ class ShipmentItem(BaseModel):
 
     in_stock = models.BooleanField(default=False, verbose_name="На складе")
 
+    photo_report = models.BooleanField(default=False, verbose_name="Фотоотчет")
+
     class Meta:
         ordering = ["-client_id", "-name"]
         verbose_name = "Товар для отправки"

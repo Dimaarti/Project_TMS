@@ -59,6 +59,7 @@ class ShipmentItemForm(forms.ModelForm):
             "weight",
             "volume",
             "in_stock",
+            "photo_report",
         ]
 
         widgets = {
@@ -72,6 +73,7 @@ class ShipmentItemForm(forms.ModelForm):
             "weight": forms.NumberInput(attrs={"class": "form-control"}),
             "volume": forms.NumberInput(attrs={"class": "form-control"}),
             "in_stock": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "photo_report": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
 
