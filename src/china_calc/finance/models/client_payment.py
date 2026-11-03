@@ -1,7 +1,4 @@
-from decimal import Decimal
-
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
 from django.db import models
 
 from config.base_models import BaseModel
@@ -26,7 +23,6 @@ class ClientPayment(BaseModel):
     amount = models.DecimalField(
         max_digits=14,
         decimal_places=2,
-        validators=[MinValueValidator(Decimal("0.01"))],
         verbose_name="Сумма оплаты",
     )
 
