@@ -1,11 +1,14 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.text import slugify
 from django.views import View
 
 from china_calc.client.models import Client
+from china_calc.reports.services.report_item_list_services import (
+    ShipmentPackingListServices,
+)
 from china_calc.reports.services.report_services import ShipmentReportServices
 from china_calc.shipment.models import Shipment
 
@@ -59,3 +62,24 @@ class ShipmentReportView(LoginRequiredMixin, View):
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             ),
         )
+
+
+class ShipmentPackingListView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        shipment = get_object_or_404(Shipment, pk=pk, user=request.user)
+
+        try:
+            buffer = ShipmentPackingListServices(shipment).build()
+        except ValueError as e:
+            return HttpResponse(str(e), status=400)
+
+        response = HttpResponse(
+            buffer.getvalue(),
+            content_type=(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            ),
+        )
+        response["Content-Disposition"] = (
+            f'attachment; filename="packing_list_{shipment.number}.xlsx"'
+        )
+        return response
