@@ -1,8 +1,11 @@
 from datetime import datetime
 from io import BytesIO
 
+from django.db.models import Prefetch
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
+
+from china_calc.finance.models import ItemCalculationResult
 
 
 class ShipmentPackingListServices:
@@ -13,11 +16,23 @@ class ShipmentPackingListServices:
         self.client = client
 
     def build(self):
+        calc = self.shipment.calculation_results.filter(is_actual=True).first()
         items_qs = self.shipment.items.select_related("client").order_by(
             "client_id", "pk"
         )
         if self.client is not None:
             items_qs = items_qs.filter(client=self.client)
+
+        if calc is not None:
+            items_qs = items_qs.prefetch_related(
+                Prefetch(
+                    "item_calculation_results",
+                    queryset=ItemCalculationResult.objects.filter(
+                        client_result__calculation_result=calc
+                    ),
+                    to_attr="actual_item_results",
+                )
+            )
 
         items = list(items_qs)
         if not items:
@@ -49,11 +64,11 @@ class ShipmentPackingListServices:
         sheet.append([None])
 
         # --- шапка таблицы ---
-        headers = ["№", "Товар", "Трек-номер", "Кол-во"]
+        headers = ["№", "Товар", "Цена товара, BYN", "Трек-номер", "Кол-во"]
         sheet.append(headers)
 
         header_row = sheet.max_row
-        for col in range(1, 5):
+        for col in range(1, 6):
             cell = sheet.cell(row=header_row, column=col)
             cell.font = Font(bold=True, color="FFFFFF")
             cell.fill = PatternFill(fill_type="solid", fgColor="4472C4")
@@ -63,10 +78,23 @@ class ShipmentPackingListServices:
         # --- строки ---
         total_qty = 0
         for idx, item in enumerate(items, start=1):
+            item_calc = None
+            for r in getattr(item, "actual_item_results", []):
+                if self.client is None or r.client_result.client_id == item.client_id:
+                    item_calc = r
+                    break
+
+            client_unit_price = (
+                (item_calc.client_purchase_cost / item.quantity)
+                if item_calc is not None and item.quantity
+                else None
+            )
+
             sheet.append(
                 [
                     idx,
                     item.name,
+                    client_unit_price if client_unit_price is not None else "—",
                     item.tracking_number or "—",
                     item.quantity,
                 ]
@@ -74,37 +102,38 @@ class ShipmentPackingListServices:
             row = sheet.max_row
             total_qty += item.quantity
 
-            for col in range(1, 5):
+            for col in range(1, 6):
                 cell = sheet.cell(row=row, column=col)
                 cell.border = border
                 cell.alignment = Alignment(
                     vertical="center",
-                    horizontal="center" if col in (1, 4) else "left",
+                    horizontal="center" if col in (1, 5) else "left",
                     wrap_text=(col == 2),
                 )
 
             # выделяем трек-номер
-            track_cell = sheet.cell(row=row, column=3)
+            track_cell = sheet.cell(row=row, column=4)
             if item.tracking_number:
                 track_cell.font = Font(bold=True, color="1F4E79")
             else:
                 track_cell.font = Font(color="999999", italic=True)
 
         # --- итог ---
-        sheet.append(["", "ИТОГО", "", total_qty])
+        sheet.append(["", "ИТОГО", "", "", total_qty])
         total_row = sheet.max_row
-        for col in range(1, 5):
+        for col in range(1, 6):
             cell = sheet.cell(row=total_row, column=col)
             cell.font = Font(bold=True)
             cell.fill = PatternFill(fill_type="solid", fgColor="FFF2CC")
             cell.border = border
-            cell.alignment = Alignment(horizontal="center" if col in (1, 4) else "left")
+            cell.alignment = Alignment(horizontal="center" if col in (1, 5) else "left")
 
         # --- ширины ---
         sheet.column_dimensions["A"].width = 6
         sheet.column_dimensions["B"].width = 55
-        sheet.column_dimensions["C"].width = 28
-        sheet.column_dimensions["D"].width = 10
+        sheet.column_dimensions["C"].width = 20
+        sheet.column_dimensions["D"].width = 30
+        sheet.column_dimensions["E"].width = 10
 
         buffer = BytesIO()
         workbook.save(buffer)
