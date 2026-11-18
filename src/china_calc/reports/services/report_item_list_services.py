@@ -84,8 +84,8 @@ class ShipmentPackingListServices:
                     item_calc = r
                     break
 
-            client_unit_price = (
-                (item_calc.client_purchase_cost / item.quantity)
+            unit_price = (
+                (item_calc.purchase_cost / item.quantity)
                 if item_calc is not None and item.quantity
                 else None
             )
@@ -94,7 +94,7 @@ class ShipmentPackingListServices:
                 [
                     idx,
                     item.name,
-                    client_unit_price if client_unit_price is not None else "—",
+                    unit_price if unit_price is not None else "—",
                     item.tracking_number or "—",
                     item.quantity,
                 ]
