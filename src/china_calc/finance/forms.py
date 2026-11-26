@@ -40,7 +40,9 @@ class ExchangeRateForm(forms.ModelForm):
         ]
 
         widgets = {
-            "date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+            "date": forms.DateInput(
+                format="%Y-%m-%d", attrs={"type": "date", "class": "form-control"}
+            ),
         }
 
 

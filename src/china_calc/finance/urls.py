@@ -9,6 +9,7 @@ from china_calc.finance.views import (
     ExchangeRateDeleteView,
     ExchangeRateDetailView,
     ExchangeRateListView,
+    ExchangeRateUpdateView,
 )
 
 app_name = "finance"
@@ -17,6 +18,7 @@ urlpatterns = [
     path("", ExchangeRateListView.as_view(), name="rate_list"),
     path("rate/<int:pk>", ExchangeRateDetailView.as_view(), name="rate_detail"),
     path("rate/create/", ExchangeRateCreateView.as_view(), name="rate_create"),
+    path("rate/<int:pk>/update/", ExchangeRateUpdateView.as_view(), name="rate_update"),
     path("rate/<int:pk>/delete/", ExchangeRateDeleteView.as_view(), name="rate_delete"),
     path(
         "calculations/",

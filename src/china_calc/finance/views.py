@@ -4,7 +4,7 @@ from django.db.models import Count, Prefetch, ProtectedError, Sum
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import CreateView, DeleteView, DetailView, ListView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from china_calc.client.models import Client
 from china_calc.finance.forms import ClientPaymentForm, ExchangeRateForm
@@ -96,6 +96,21 @@ class ExchangeRateCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         messages.success(self.request, "Курсы валют успешно добавлены")
         return super().form_valid(form)
+
+
+class ExchangeRateUpdateView(LoginRequiredMixin, UpdateView):
+    model = ExchangeRate
+    form_class = ExchangeRateForm
+    template_name = "finance/exchange_rate_create.html"
+    success_url = reverse_lazy("finance:rate_list")
+
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Курс валют изменен")
+        return response
 
 
 class ExchangeRateDeleteView(LoginRequiredMixin, DeleteView):
